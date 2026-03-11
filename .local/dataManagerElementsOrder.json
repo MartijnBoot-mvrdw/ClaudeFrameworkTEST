@@ -1,0 +1,57 @@
+{
+  "Workflows": [
+    {
+      "Path": null,
+      "SortBy": 0,
+      "VariablesSectionElementsOrder": [],
+      "ArgumentsSectionElementsOrder": null,
+      "ConstantsSectionElementsOrder": [],
+      "AddedNamespaces": null
+    },
+    {
+      "Path": "Main.xaml",
+      "SortBy": 0,
+      "VariablesSectionElementsOrder": [
+        "TransactionItem&StateMachine_1",
+        "SystemException&StateMachine_1",
+        "BusinessRuleException&StateMachine_1",
+        "TransactionNumber&StateMachine_1",
+        "Config&StateMachine_1",
+        "RetryNumber&StateMachine_1",
+        "dt_TransactionData&StateMachine_1",
+        "TransactionDetails&StateMachine_1",
+        "TransactionQueueItem&StateMachine_1",
+        "ConsecutiveSystemExceptions&StateMachine_1",
+        "dt_LogmailAttachment&StateMachine_1",
+        "EndProcessTrigger&StateMachine_1",
+        "RetryCountInitAllApplications&Sequence_4",
+        "ConfigFile&Sequence_17",
+        "ConfigFileCopy&Sequence_23",
+        "dt_LogmailAttachmentConfig&Sequence_64",
+        "InputDialogResult&Sequence_32",
+        "NumberProvided&Sequence_32",
+        "LogMessageText&Sequence_28",
+        "dt_NLogMessages&Sequence_42",
+        "ShouldStop&Sequence_1",
+        "FatalErrorMessageText&Sequence_13",
+        "ExceptionMessage&Sequence_37",
+        "LogMessageText&Sequence_29"
+      ],
+      "ArgumentsSectionElementsOrder": [
+        "OrchestratorQueueName"
+      ],
+      "ConstantsSectionElementsOrder": [],
+      "AddedNamespaces": null
+    },
+    {
+      "Path": "Sandbox.xaml",
+      "SortBy": 0,
+      "VariablesSectionElementsOrder": [
+        "variable1&Sequence_1"
+      ],
+      "ArgumentsSectionElementsOrder": [],
+      "ConstantsSectionElementsOrder": [],
+      "AddedNamespaces": null
+    }
+  ]
+}

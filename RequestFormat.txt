@@ -1,0 +1,2 @@
+<table style="border-collapse: collapse; width: [var_table_width]; height: 36px;" border="1">
+	<tbody>

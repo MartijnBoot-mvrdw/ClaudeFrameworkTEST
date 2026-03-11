@@ -1,0 +1,4 @@
+<style>p {font-family:[var_font];}</style>
+<p style="text-align: left;">[var_aanhef]</p>
+<p style="text-align: left;">Op [var_datum] is het RPA-proces voor '[var_procesnaam]' afgerond[var_runid].</p>
+<p style="text-align: left;">[var_tekstbijlages]</p>

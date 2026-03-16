@@ -1,7 +1,7 @@
 {
-  "name": "REFramework_MvR_Windows",
+  "name": "SMOS_OmruilactieWitgoed",
   "projectId": "618aa872-ca6f-4f7e-978a-455ad5dd9ea3",
-  "description": "Robotic Enterprise Framework (Windows) - edit MvR - v1.0",
+  "description": "Doorfaseren Omruilactie Witgoed fase 10 t/m fase 90 - Gemeente Eindhoven - MvR REFramework v1.0",
   "main": "Main.xaml",
   "dependencies": {
     "UiPath.Excel.Activities": "[2.23.4]",

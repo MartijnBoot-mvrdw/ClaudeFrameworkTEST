@@ -1,0 +1,52 @@
+<Activity mc:Ignorable="sap sap2010" x:Class="_003_Suite_CheckBRPKoppeling" xmlns="http://schemas.microsoft.com/netfx/2009/xaml/activities" xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" xmlns:mva="clr-namespace:Microsoft.VisualBasic.Activities;assembly=System.Activities" xmlns:sap="http://schemas.microsoft.com/netfx/2009/xaml/activities/presentation" xmlns:sap2010="http://schemas.microsoft.com/netfx/2010/xaml/activities/presentation" xmlns:scg="clr-namespace:System.Collections.Generic;assembly=System.Private.CoreLib" xmlns:sco="clr-namespace:System.Collections.ObjectModel;assembly=System.Private.CoreLib" xmlns:ui="http://schemas.uipath.com/workflow/activities" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+  <x:Members>
+    <x:Property Name="in_Config" Type="InArgument(scg:Dictionary(x:String, x:String))" />
+    <x:Property Name="out_HasBRPKoppeling" Type="OutArgument(x:Boolean)" />
+  </x:Members>
+  <mva:VisualBasic.Settings>
+    <x:Null />
+  </mva:VisualBasic.Settings>
+  <TextExpression.NamespacesForImplementation>
+    <sco:Collection x:TypeArguments="x:String">
+      <x:String>System.Activities</x:String>
+      <x:String>System.Activities.Statements</x:String>
+      <x:String>System.Activities.Expressions</x:String>
+      <x:String>Microsoft.VisualBasic</x:String>
+      <x:String>Microsoft.VisualBasic.Activities</x:String>
+      <x:String>System</x:String>
+      <x:String>System.Collections.Generic</x:String>
+      <x:String>System.Linq</x:String>
+      <x:String>UiPath.Core</x:String>
+      <x:String>UiPath.Core.Activities</x:String>
+      <x:String>System.Collections</x:String>
+    </sco:Collection>
+  </TextExpression.NamespacesForImplementation>
+  <TextExpression.ReferencesForImplementation>
+    <sco:Collection x:TypeArguments="AssemblyReference">
+      <AssemblyReference>System.Activities</AssemblyReference>
+      <AssemblyReference>Microsoft.VisualBasic</AssemblyReference>
+      <AssemblyReference>mscorlib</AssemblyReference>
+      <AssemblyReference>System</AssemblyReference>
+      <AssemblyReference>System.Core</AssemblyReference>
+      <AssemblyReference>UiPath.System.Activities</AssemblyReference>
+      <AssemblyReference>UiPath.UiAutomation.Activities</AssemblyReference>
+    </sco:Collection>
+  </TextExpression.ReferencesForImplementation>
+  <Sequence sap2010:Annotation.AnnotationText="003_Suite_CheckBRPKoppeling&#xA;&#xA;Doel: Controleer in de takensectie van het geopende werkproces of de taak&#xA;      'Client koppelen aan BRP' aanwezig is (= BRP koppeling ontbreekt).&#xA;&#xA;Logica (zie PDD §4.4):&#xA;  - Taak 'Client koppelen aan BRP' NIET aanwezig → BRP koppeling OK → out_HasBRPKoppeling = True&#xA;  - Taak 'Client koppelen aan BRP' WEL aanwezig  → BRP koppeling ontbreekt → out_HasBRPKoppeling = False&#xA;&#xA;Input:  geopend werkproces in fase 10&#xA;Output: out_HasBRPKoppeling (Boolean)&#xA;&#xA;Aangeroepen vanuit: Process.xaml&#xA;&#xA;TODO - Uit te voeren in UiPath Studio:&#xA;1. Ga naar het takenoverzicht van het werkproces&#xA;2. Gebruik Element Exists of Check App State om te controleren of&#xA;   de taak 'Client koppelen aan BRP' zichtbaar is&#xA;3. Assign: out_HasBRPKoppeling = NOT bool_BRPTaakGevonden&#xA;4. Als er een pop-up bij de BRP-taak verschijnt: sluit de pop-up (Click OK)&#xA;5. Selector taksrij 'Client koppelen aan BRP': TODO - opnemen in UiPath Studio&#xA;&#xA;GEBRUIK: Element Exists retourneert nooit een exception (veilig voor detectie)" DisplayName="003_Suite_CheckBRPKoppeling" sap2010:WorkflowViewState.IdRef="Sequence_1">
+    <sap:WorkflowViewStateService.ViewState>
+      <scg:Dictionary x:TypeArguments="x:String, x:Object">
+        <x:Boolean x:Key="IsExpanded">True</x:Boolean>
+        <x:Boolean x:Key="IsAnnotationDocked">True</x:Boolean>
+      </scg:Dictionary>
+    </sap:WorkflowViewStateService.ViewState>
+    <Sequence.Variables>
+      <Variable x:TypeArguments="x:Boolean" Name="bool_BRPTaakGevonden" Default="[False]" />
+    </Sequence.Variables>
+    <ui:LogMessage DisplayName="Log Message - In: 003_Suite_CheckBRPKoppeling" sap2010:WorkflowViewState.IdRef="LogMessage_1" Level="Info" Message="[&quot;In: 003_Suite_CheckBRPKoppeling&quot;]" />
+    <!-- TODO: Element Exists - taak 'Client koppelen aan BRP' - Selector: TODO in Studio -->
+    <!-- TODO: Assign bool_BRPTaakGevonden = [resultaat Element Exists] -->
+    <!-- TODO: [If bool_BRPTaakGevonden] Click sluiten pop-up bij BRP-taak - Selector: TODO in Studio -->
+    <!-- TODO: Assign out_HasBRPKoppeling = Not bool_BRPTaakGevonden -->
+    <ui:LogMessage DisplayName="Log Message - BRP koppeling check resultaat" sap2010:WorkflowViewState.IdRef="LogMessage_2" Level="Info" Message="[&quot;BRP koppeling aanwezig: &quot; + out_HasBRPKoppeling.ToString()]" />
+  </Sequence>
+</Activity>

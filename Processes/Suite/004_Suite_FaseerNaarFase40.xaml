@@ -1,0 +1,48 @@
+<Activity mc:Ignorable="sap sap2010" x:Class="_004_Suite_FaseerNaarFase40" xmlns="http://schemas.microsoft.com/netfx/2009/xaml/activities" xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" xmlns:mva="clr-namespace:Microsoft.VisualBasic.Activities;assembly=System.Activities" xmlns:sap="http://schemas.microsoft.com/netfx/2009/xaml/activities/presentation" xmlns:sap2010="http://schemas.microsoft.com/netfx/2010/xaml/activities/presentation" xmlns:scg="clr-namespace:System.Collections.Generic;assembly=System.Private.CoreLib" xmlns:sco="clr-namespace:System.Collections.ObjectModel;assembly=System.Private.CoreLib" xmlns:ui="http://schemas.uipath.com/workflow/activities" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+  <x:Members>
+    <x:Property Name="in_Config" Type="InArgument(scg:Dictionary(x:String, x:String))" />
+  </x:Members>
+  <mva:VisualBasic.Settings>
+    <x:Null />
+  </mva:VisualBasic.Settings>
+  <TextExpression.NamespacesForImplementation>
+    <sco:Collection x:TypeArguments="x:String">
+      <x:String>System.Activities</x:String>
+      <x:String>System.Activities.Statements</x:String>
+      <x:String>System.Activities.Expressions</x:String>
+      <x:String>Microsoft.VisualBasic</x:String>
+      <x:String>Microsoft.VisualBasic.Activities</x:String>
+      <x:String>System</x:String>
+      <x:String>System.Collections.Generic</x:String>
+      <x:String>System.Linq</x:String>
+      <x:String>UiPath.Core</x:String>
+      <x:String>UiPath.Core.Activities</x:String>
+      <x:String>System.Collections</x:String>
+    </sco:Collection>
+  </TextExpression.NamespacesForImplementation>
+  <TextExpression.ReferencesForImplementation>
+    <sco:Collection x:TypeArguments="AssemblyReference">
+      <AssemblyReference>System.Activities</AssemblyReference>
+      <AssemblyReference>Microsoft.VisualBasic</AssemblyReference>
+      <AssemblyReference>mscorlib</AssemblyReference>
+      <AssemblyReference>System</AssemblyReference>
+      <AssemblyReference>System.Core</AssemblyReference>
+      <AssemblyReference>UiPath.System.Activities</AssemblyReference>
+      <AssemblyReference>UiPath.UiAutomation.Activities</AssemblyReference>
+    </sco:Collection>
+  </TextExpression.ReferencesForImplementation>
+  <Sequence sap2010:Annotation.AnnotationText="004_Suite_FaseerNaarFase40&#xA;&#xA;Doel: Faseer het geopende werkproces door naar fase 40.&#xA;&#xA;Handelingen (zie PDD §4.2):&#xA;  1. Klik op 'Wijzigen fase' knop&#xA;  2. Klik op 'Opslaan en sluiten'&#xA;&#xA;Input:  geopend werkproces (na BRP-check geslaagd)&#xA;Output: werkproces in fase 40&#xA;&#xA;Aangeroepen vanuit: Process.xaml (happy flow)&#xA;&#xA;TODO - Uit te voeren in UiPath Studio:&#xA;1. Click 'Wijzigen fase' knop - Selector: TODO in Studio&#xA;2. Check App State: wacht op fase-dialoog&#xA;3. Click 'Opslaan en sluiten' knop - Selector: TODO in Studio&#xA;4. Check App State: wacht op werkproces in fase 40&#xA;&#xA;GEBRUIK: SimulateClick (unattended)" DisplayName="004_Suite_FaseerNaarFase40" sap2010:WorkflowViewState.IdRef="Sequence_1">
+    <sap:WorkflowViewStateService.ViewState>
+      <scg:Dictionary x:TypeArguments="x:String, x:Object">
+        <x:Boolean x:Key="IsExpanded">True</x:Boolean>
+        <x:Boolean x:Key="IsAnnotationDocked">True</x:Boolean>
+      </scg:Dictionary>
+    </sap:WorkflowViewStateService.ViewState>
+    <ui:LogMessage DisplayName="Log Message - In: 004_Suite_FaseerNaarFase40" sap2010:WorkflowViewState.IdRef="LogMessage_1" Level="Info" Message="[&quot;In: 004_Suite_FaseerNaarFase40&quot;]" />
+    <!-- TODO: Click 'Wijzigen fase' knop - Selector: TODO in Studio -->
+    <!-- TODO: Check App State - wacht op fase-dialoog -->
+    <!-- TODO: Click 'Opslaan en sluiten' - Selector: TODO in Studio -->
+    <!-- TODO: Check App State - wacht op werkproces fase 40 bevestiging -->
+    <ui:LogMessage DisplayName="Log Message - Werkproces in fase 40" sap2010:WorkflowViewState.IdRef="LogMessage_2" Level="Info" Message="[&quot;Werkproces doorgefaseerd naar fase 40&quot;]" />
+  </Sequence>
+</Activity>

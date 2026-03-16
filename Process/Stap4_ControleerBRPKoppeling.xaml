@@ -1,0 +1,89 @@
+<Activity mc:Ignorable="sap sap2010" x:Class="Stap4_ControleerBRPKoppeling" xmlns="http://schemas.microsoft.com/netfx/2009/xaml/activities" xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" xmlns:sap="http://schemas.microsoft.com/netfx/2009/xaml/activities/presentation" xmlns:sap2010="http://schemas.microsoft.com/netfx/2010/xaml/activities/presentation" xmlns:scg="clr-namespace:System.Collections.Generic;assembly=System.Private.CoreLib" xmlns:sco="clr-namespace:System.Collections.ObjectModel;assembly=System.Private.CoreLib" xmlns:ui="http://schemas.uipath.com/workflow/activities" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+  <x:Members>
+    <x:Property Name="in_Config" Type="InArgument(scg:Dictionary(x:String, x:String))" />
+    <x:Property sap2010:Annotation.AnnotationText="True = cliënt heeft BRP koppeling (normaal pad: faseer door). False = geen BRP koppeling (uitval pad: verplaats naar WGO 2)." Name="out_HeeftBRPKoppeling" Type="OutArgument(x:Boolean)" />
+  </x:Members>
+  <VisualBasic.Settings>
+    <x:Null />
+  </VisualBasic.Settings>
+  <sap:VirtualizedContainerService.HintSize>900,600</sap:VirtualizedContainerService.HintSize>
+  <sap2010:WorkflowViewState.IdRef>Stap4_ControleerBRPKoppeling_1</sap2010:WorkflowViewState.IdRef>
+  <TextExpression.NamespacesForImplementation>
+    <sco:Collection x:TypeArguments="x:String">
+      <x:String>System.Activities</x:String>
+      <x:String>System.Activities.Statements</x:String>
+      <x:String>System.Activities.Expressions</x:String>
+      <x:String>System.Activities.Validation</x:String>
+      <x:String>System.Activities.XamlIntegration</x:String>
+      <x:String>Microsoft.VisualBasic</x:String>
+      <x:String>Microsoft.VisualBasic.Activities</x:String>
+      <x:String>System</x:String>
+      <x:String>System.Collections</x:String>
+      <x:String>System.Collections.Generic</x:String>
+      <x:String>System.Data</x:String>
+      <x:String>System.Diagnostics</x:String>
+      <x:String>System.Drawing</x:String>
+      <x:String>System.IO</x:String>
+      <x:String>System.Linq</x:String>
+      <x:String>System.Net.Mail</x:String>
+      <x:String>System.Xml</x:String>
+      <x:String>System.Xml.Linq</x:String>
+      <x:String>UiPath.Core</x:String>
+      <x:String>UiPath.Core.Activities</x:String>
+      <x:String>System.Windows.Markup</x:String>
+      <x:String>System.Runtime.Serialization</x:String>
+      <x:String>System.Reflection</x:String>
+      <x:String>System.Collections.ObjectModel</x:String>
+      <x:String>GlobalVariablesNamespace</x:String>
+      <x:String>GlobalConstantsNamespace</x:String>
+    </sco:Collection>
+  </TextExpression.NamespacesForImplementation>
+  <TextExpression.ReferencesForImplementation>
+    <scg:List x:TypeArguments="AssemblyReference" Capacity="20">
+      <AssemblyReference>System.Activities</AssemblyReference>
+      <AssemblyReference>Microsoft.VisualBasic</AssemblyReference>
+      <AssemblyReference>mscorlib</AssemblyReference>
+      <AssemblyReference>System.Data</AssemblyReference>
+      <AssemblyReference>System</AssemblyReference>
+      <AssemblyReference>System.Drawing</AssemblyReference>
+      <AssemblyReference>System.Core</AssemblyReference>
+      <AssemblyReference>System.Xml</AssemblyReference>
+      <AssemblyReference>System.Xml.Linq</AssemblyReference>
+      <AssemblyReference>PresentationFramework</AssemblyReference>
+      <AssemblyReference>WindowsBase</AssemblyReference>
+      <AssemblyReference>PresentationCore</AssemblyReference>
+      <AssemblyReference>System.Xaml</AssemblyReference>
+      <AssemblyReference>System.ComponentModel.Composition</AssemblyReference>
+      <AssemblyReference>System.ServiceModel</AssemblyReference>
+      <AssemblyReference>UiPath.System.Activities</AssemblyReference>
+      <AssemblyReference>UiPath.UiAutomation.Activities</AssemblyReference>
+      <AssemblyReference>System.ValueTuple</AssemblyReference>
+      <AssemblyReference>Microsoft.Bcl.AsyncInterfaces</AssemblyReference>
+      <AssemblyReference>UiPath.UIAutomationCore</AssemblyReference>
+    </scg:List>
+  </TextExpression.ReferencesForImplementation>
+  <Sequence sap2010:Annotation.AnnotationText="Stap 4: Controleer op BRP koppeling&#xA;&#xA;Pre-condition: Werkproces is geopend in fase 10&#xA;Post-condition: out_HeeftBRPKoppeling is gevuld (True/False)&#xA;&#xA;Logica:&#xA;- Controleer bij het tabblad 'Taken' of de taak '1 Client koppelen aan BRP' aanwezig is&#xA;  * Zo JA (taak aanwezig): out_HeeftBRPKoppeling = True  → normaal pad (fase 40 en 90)&#xA;  * Zo NEE (taak niet aanwezig / cliënt heeft geen BRP): out_HeeftBRPKoppeling = False → uitval pad WGO 2&#xA;&#xA;Te bouwen UI-stappen:&#xA;1. Gebruik Element Exists om te controleren of de taak '1 Client koppelen aan BRP' zichtbaar is&#xA;2. Wijs het resultaat toe aan out_HeeftBRPKoppeling&#xA;3. Als er een pop-up verschijnt (bijzondere situatie melding): sluit de pop-up (klik OK)" DisplayName="Stap 4 - Controleer BRP koppeling" sap:VirtualizedContainerService.HintSize="800,500" sap2010:WorkflowViewState.IdRef="Sequence_1">
+    <Sequence.Variables>
+      <Variable x:TypeArguments="x:Boolean" Default="[False]" Name="b_ElementExists" />
+    </Sequence.Variables>
+    <sap:WorkflowViewStateService.ViewState>
+      <scg:Dictionary x:TypeArguments="x:String, x:Object">
+        <x:Boolean x:Key="IsExpanded">True</x:Boolean>
+        <x:Boolean x:Key="IsAnnotationDocked">True</x:Boolean>
+      </scg:Dictionary>
+    </sap:WorkflowViewStateService.ViewState>
+    <ui:LogMessage DisplayName="Log - Stap 4 Start" sap:VirtualizedContainerService.HintSize="600,80" sap2010:WorkflowViewState.IdRef="LogMessage_1" Level="Info" Message="[&quot;Stap 4: Controleer BRP koppeling&quot;]" />
+    <!-- TODO: Element Exists - zoek naar taak '1 Client koppelen aan BRP' in het taken-tabblad -->
+    <!--        Resultaat opslaan in variabele b_ElementExists                                    -->
+    <!-- TODO: Als er een pop-up (bijzondere situatie) verschijnt: sluit deze met klik OK         -->
+    <Assign DisplayName="Assign out_HeeftBRPKoppeling" sap:VirtualizedContainerService.HintSize="600,80" sap2010:WorkflowViewState.IdRef="Assign_1">
+      <Assign.To>
+        <OutArgument x:TypeArguments="x:Boolean">[out_HeeftBRPKoppeling]</OutArgument>
+      </Assign.To>
+      <Assign.Value>
+        <InArgument x:TypeArguments="x:Boolean">[b_ElementExists]</InArgument>
+      </Assign.Value>
+    </Assign>
+    <ui:LogMessage DisplayName="Log - Stap 4 Resultaat" sap:VirtualizedContainerService.HintSize="600,80" sap2010:WorkflowViewState.IdRef="LogMessage_2" Level="Info" Message="[&quot;Stap 4: BRP koppeling aanwezig = &quot; &amp; out_HeeftBRPKoppeling.ToString]" />
+  </Sequence>
+</Activity>

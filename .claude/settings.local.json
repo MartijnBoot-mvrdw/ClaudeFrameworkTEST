@@ -1,0 +1,7 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(find /c/Users/MartijnBoot/Documents/GitHub-MvRDW/ClaudeFrameworkTEST/ClaudeFrameworkTEST -not -path */.git* -type d)"
+    ]
+  }
+}

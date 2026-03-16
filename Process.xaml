@@ -74,13 +74,103 @@
       <AssemblyReference>UiPath.Studio.Constants</AssemblyReference>
     </scg:List>
   </TextExpression.ReferencesForImplementation>
-  <Sequence sap2010:Annotation.AnnotationText="Description: In this file all other process specific files will be invoked. If an application exception occurs, the current transaction can be retried. If a BRE is thrown, the transaction will be skipped. Can be a flowchart or sequence. &#xA;&#xA;Option: If you use the Framework Retry mechanism (i.e. not QueueRetry), you can stop the retry mechanism after reaching a certain stage in the process.xaml. Just assign io_TransactionDetails(&quot;StopRetryMechanism&quot;) with the value &quot;True&quot;" DisplayName="ProcessTransaction" sap:VirtualizedContainerService.HintSize="400,191" sap2010:WorkflowViewState.IdRef="Sequence_1">
+  <Sequence sap2010:Annotation.AnnotationText="SMOS_OmruilactieWitgoed - ProcessTransaction&#xA;&#xA;Procesflow (zie PDD sectie 3.10):&#xA;1. Open werkproces vanuit WGO werkbak&#xA;2. Controleer BRP koppeling&#xA;   - JA (BRP aanwezig): Faseer naar fase 40 → Faseer naar fase 90 (werkbak ABV)&#xA;   - NEE (geen BRP): Verplaats naar WGO 2 werkbak (uitval)&#xA;&#xA;Uitval wordt gelogd via io_TransactionDetails en gerapporteerd per mail (functionaliteit in het framework).&#xA;Om de retry te stoppen na stap 1: io_TransactionDetails(&quot;StopRetryMechanism&quot;) = &quot;True&quot;" DisplayName="ProcessTransaction" sap:VirtualizedContainerService.HintSize="1200,900" sap2010:WorkflowViewState.IdRef="Sequence_1">
+    <Sequence.Variables>
+      <Variable x:TypeArguments="x:Boolean" Default="[False]" Name="b_HeeftBRPKoppeling" />
+    </Sequence.Variables>
     <sap:WorkflowViewStateService.ViewState>
       <scg:Dictionary x:TypeArguments="x:String, x:Object">
         <x:Boolean x:Key="IsExpanded">True</x:Boolean>
         <x:Boolean x:Key="IsAnnotationDocked">True</x:Boolean>
       </scg:Dictionary>
     </sap:WorkflowViewStateService.ViewState>
-    <ui:LogMessage DisplayName="Log Message Process Start" sap:VirtualizedContainerService.HintSize="358,101" sap2010:WorkflowViewState.IdRef="LogMessage_1" Level="Info" Message="[&quot;In: Process&quot;]" />
+
+    <ui:LogMessage DisplayName="Log - Process Start" sap:VirtualizedContainerService.HintSize="800,80" sap2010:WorkflowViewState.IdRef="LogMessage_1" Level="Info" Message="[&quot;Process gestart voor transactie: &quot; &amp; in_TransactionItem]" />
+
+    <!-- ═══════════════════════════════════════════════════════════ -->
+    <!-- STAP 1: Open het werkproces vanuit de WGO werkbak          -->
+    <!-- ═══════════════════════════════════════════════════════════ -->
+    <ui:InvokeWorkflowFile ArgumentsVariable="{x:Null}" ContinueOnError="{x:Null}" DisplayName="Invoke Stap 1 - Openen werkproces" sap:VirtualizedContainerService.HintSize="800,100" sap2010:WorkflowViewState.IdRef="InvokeWorkflowFile_1" UnSafe="False" WorkflowFileName="Process\Stap1_OpenWerkproces.xaml">
+      <ui:InvokeWorkflowFile.Arguments>
+        <InArgument x:TypeArguments="x:String" x:Key="in_TransactionItem">[in_TransactionItem]</InArgument>
+        <InArgument x:TypeArguments="scg:Dictionary(x:String, x:String)" x:Key="in_Config">[in_Config]</InArgument>
+      </ui:InvokeWorkflowFile.Arguments>
+    </ui:InvokeWorkflowFile>
+
+    <!-- Stop retry-mechanisme na stap 1 (werkproces is geopend, hervatten bij fout leidt tot dubbele actie) -->
+    <Assign DisplayName="Stop retry na Stap 1" sap:VirtualizedContainerService.HintSize="800,80" sap2010:WorkflowViewState.IdRef="Assign_StopRetry">
+      <Assign.To>
+        <OutArgument x:TypeArguments="x:String">[io_TransactionDetails("StopRetryMechanism")]</OutArgument>
+      </Assign.To>
+      <Assign.Value>
+        <InArgument x:TypeArguments="x:String">["True"]</InArgument>
+      </Assign.Value>
+    </Assign>
+
+    <!-- ═══════════════════════════════════════════════════════════ -->
+    <!-- STAP 4: Controleer BRP koppeling (beslissing in de flow)   -->
+    <!-- ═══════════════════════════════════════════════════════════ -->
+    <ui:InvokeWorkflowFile ArgumentsVariable="{x:Null}" ContinueOnError="{x:Null}" DisplayName="Invoke Stap 4 - Controleer BRP koppeling" sap:VirtualizedContainerService.HintSize="800,100" sap2010:WorkflowViewState.IdRef="InvokeWorkflowFile_4" UnSafe="False" WorkflowFileName="Process\Stap4_ControleerBRPKoppeling.xaml">
+      <ui:InvokeWorkflowFile.Arguments>
+        <InArgument x:TypeArguments="scg:Dictionary(x:String, x:String)" x:Key="in_Config">[in_Config]</InArgument>
+        <OutArgument x:TypeArguments="x:Boolean" x:Key="out_HeeftBRPKoppeling">[b_HeeftBRPKoppeling]</OutArgument>
+      </ui:InvokeWorkflowFile.Arguments>
+    </ui:InvokeWorkflowFile>
+
+    <!-- ═══════════════════════════════════════════════════════════ -->
+    <!-- BRP BESLISSING                                              -->
+    <!-- JA  → Stap 2 (fase 40) + Stap 3 (fase 90)                 -->
+    <!-- NEE → Stap 5 uitval (WGO 2 werkbak)                        -->
+    <!-- ═══════════════════════════════════════════════════════════ -->
+    <If Condition="[b_HeeftBRPKoppeling]" DisplayName="Als BRP koppeling aanwezig?" sap:VirtualizedContainerService.HintSize="800,400" sap2010:WorkflowViewState.IdRef="If_BRP">
+      <sap:WorkflowViewStateService.ViewState>
+        <scg:Dictionary x:TypeArguments="x:String, x:Object">
+          <x:Boolean x:Key="IsExpanded">True</x:Boolean>
+        </scg:Dictionary>
+      </sap:WorkflowViewStateService.ViewState>
+      <If.Then>
+        <!-- JA: BRP koppeling aanwezig - normaal pad -->
+        <Sequence DisplayName="Normaal pad: Faseer fase 40 → fase 90" sap:VirtualizedContainerService.HintSize="700,300" sap2010:WorkflowViewState.IdRef="Sequence_NormaalPad">
+          <sap:WorkflowViewStateService.ViewState>
+            <scg:Dictionary x:TypeArguments="x:String, x:Object">
+              <x:Boolean x:Key="IsExpanded">True</x:Boolean>
+            </scg:Dictionary>
+          </sap:WorkflowViewStateService.ViewState>
+          <ui:InvokeWorkflowFile ArgumentsVariable="{x:Null}" ContinueOnError="{x:Null}" DisplayName="Invoke Stap 2 - Faseer naar fase 40" sap:VirtualizedContainerService.HintSize="600,80" sap2010:WorkflowViewState.IdRef="InvokeWorkflowFile_2" UnSafe="False" WorkflowFileName="Process\Stap2_FaseerNaarFase40.xaml">
+            <ui:InvokeWorkflowFile.Arguments>
+              <InArgument x:TypeArguments="scg:Dictionary(x:String, x:String)" x:Key="in_Config">[in_Config]</InArgument>
+            </ui:InvokeWorkflowFile.Arguments>
+          </ui:InvokeWorkflowFile>
+          <ui:InvokeWorkflowFile ArgumentsVariable="{x:Null}" ContinueOnError="{x:Null}" DisplayName="Invoke Stap 3 - Faseer naar fase 90" sap:VirtualizedContainerService.HintSize="600,80" sap2010:WorkflowViewState.IdRef="InvokeWorkflowFile_3" UnSafe="False" WorkflowFileName="Process\Stap3_FaseerNaarFase90.xaml">
+            <ui:InvokeWorkflowFile.Arguments>
+              <InArgument x:TypeArguments="scg:Dictionary(x:String, x:String)" x:Key="in_Config">[in_Config]</InArgument>
+            </ui:InvokeWorkflowFile.Arguments>
+          </ui:InvokeWorkflowFile>
+          <ui:LogMessage DisplayName="Log - Normaal pad succesvol" sap:VirtualizedContainerService.HintSize="600,80" sap2010:WorkflowViewState.IdRef="LogMessage_NormaalPad" Level="Info" Message="[&quot;Transactie succesvol afgerond: werkproces staat in fase 90 (werkbak ABV) - &quot; &amp; in_TransactionItem]" />
+        </Sequence>
+      </If.Then>
+      <If.Else>
+        <!-- NEE: Geen BRP koppeling - uitval pad -->
+        <Sequence DisplayName="Uitval pad: Verplaats naar WGO 2" sap:VirtualizedContainerService.HintSize="700,200" sap2010:WorkflowViewState.IdRef="Sequence_UitvalPad">
+          <sap:WorkflowViewStateService.ViewState>
+            <scg:Dictionary x:TypeArguments="x:String, x:Object">
+              <x:Boolean x:Key="IsExpanded">True</x:Boolean>
+            </scg:Dictionary>
+          </sap:WorkflowViewStateService.ViewState>
+          <ui:InvokeWorkflowFile ArgumentsVariable="{x:Null}" ContinueOnError="{x:Null}" DisplayName="Invoke Stap 5 - Verplaats naar WGO 2" sap:VirtualizedContainerService.HintSize="600,80" sap2010:WorkflowViewState.IdRef="InvokeWorkflowFile_5" UnSafe="False" WorkflowFileName="Process\Stap5_VerplaatsNaarWGO2.xaml">
+            <ui:InvokeWorkflowFile.Arguments>
+              <InArgument x:TypeArguments="scg:Dictionary(x:String, x:String)" x:Key="in_Config">[in_Config]</InArgument>
+            </ui:InvokeWorkflowFile.Arguments>
+          </ui:InvokeWorkflowFile>
+          <!-- Gooi een BusinessRuleException zodat het framework de transactie als 'uitval' markeert -->
+          <Throw sap2010:Annotation.AnnotationText="Gooi een BusinessRuleException zodat het framework de transactie als 'Business Exception' markeert en logt.&#xA;De transactie wordt NIET opnieuw geprobeerd." DisplayName="Throw BusinessRuleException - Geen BRP koppeling" sap:VirtualizedContainerService.HintSize="600,80" sap2010:WorkflowViewState.IdRef="Throw_BRPUitval">
+            <Throw.Exception>
+              <InArgument x:TypeArguments="Exception">[New UiPath.Core.BusinessRuleException("Functionele uitval: Cliënt heeft geen BRP koppeling. Werkproces verplaatst naar WGO 2 werkbak.")]</InArgument>
+            </Throw.Exception>
+          </Throw>
+        </Sequence>
+      </If.Else>
+    </If>
+
   </Sequence>
 </Activity>

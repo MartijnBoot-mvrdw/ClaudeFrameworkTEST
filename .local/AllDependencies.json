@@ -21685,15 +21685,19 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\JohansBrink\\.nuget\\packages\\": {}
+    "C:\\Users\\MartijnBoot\\.nuget\\packages\\": {}
   },
   "project": {
     "restore": {
       "projectUniqueName": "REFramework_MvR_Windows",
       "projectName": "REFramework_MvR_Windows",
-      "projectPath": "Z:\\MvR_REFramework_Windows\\.local",
-      "packagesPath": "C:\\Users\\JohansBrink\\.nuget\\packages\\",
-      "outputPath": "Z:\\MvR_REFramework_Windows\\.local"
+      "projectPath": "C:\\Users\\MartijnBoot\\Documents\\GitHub-MvRDW\\ClaudeFrameworkTEST\\ClaudeFrameworkTEST\\.local",
+      "packagesPath": "C:\\Users\\MartijnBoot\\.nuget\\packages\\",
+      "outputPath": "C:\\Users\\MartijnBoot\\Documents\\GitHub-MvRDW\\ClaudeFrameworkTEST\\ClaudeFrameworkTEST\\.local",
+      "UsingMicrosoftNETSdk": false,
+      "restoreAuditProperties": {
+        "enableAudit": "False"
+      }
     },
     "frameworks": {
       "net8.0-windows7.0": {
@@ -21724,7 +21728,7 @@
             "version": "[1.21.0, 1.21.0]"
           }
         },
-        "runtimeIdentifierGraphPath": "C:\\Users\\JohansBrink\\AppData\\Local\\Programs\\UiPath\\Studio\\PortableRuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "C:\\Users\\MartijnBoot\\AppData\\Local\\Programs\\UiPath\\Studio\\PortableRuntimeIdentifierGraph.json"
       }
     },
     "runtimes": {

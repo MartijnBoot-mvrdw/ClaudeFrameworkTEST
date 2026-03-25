@@ -1,0 +1,7 @@
+##################################
+### UiPath Ignore Folders      ###
+##################################
+## Ignore Data/Temp and Data/Log
+
+Data/Log
+Data/Temp

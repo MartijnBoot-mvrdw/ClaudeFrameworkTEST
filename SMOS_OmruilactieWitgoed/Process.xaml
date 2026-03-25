@@ -1,0 +1,225 @@
+<Activity mc:Ignorable="sap sap2010" x:Class="ProcessTransaction" xmlns="http://schemas.microsoft.com/netfx/2009/xaml/activities" xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" xmlns:sap="http://schemas.microsoft.com/netfx/2009/xaml/activities/presentation" xmlns:sap2010="http://schemas.microsoft.com/netfx/2010/xaml/activities/presentation" xmlns:scg="clr-namespace:System.Collections.Generic;assembly=System.Private.CoreLib" xmlns:sco="clr-namespace:System.Collections.ObjectModel;assembly=System.Private.CoreLib" xmlns:ui="http://schemas.uipath.com/workflow/activities" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+  <x:Members>
+    <x:Property Name="in_TransactionItem" Type="InArgument(x:String)" />
+    <x:Property Name="in_Config" Type="InArgument(scg:Dictionary(x:String, x:String))" />
+    <x:Property Name="in_TransactionQueueItem" Type="InArgument(ui:QueueItem)" />
+    <x:Property Name="io_TransactionDetails" Type="InOutArgument(scg:Dictionary(x:String, x:String))" />
+  </x:Members>
+  <VisualBasic.Settings>
+    <x:Null />
+  </VisualBasic.Settings>
+  <sap:VirtualizedContainerService.HintSize>1846,1400</sap:VirtualizedContainerService.HintSize>
+  <sap2010:WorkflowViewState.IdRef>ProcessTransaction_1</sap2010:WorkflowViewState.IdRef>
+  <TextExpression.NamespacesForImplementation>
+    <sco:Collection x:TypeArguments="x:String">
+      <x:String>System.Activities</x:String>
+      <x:String>System.Activities.Statements</x:String>
+      <x:String>System.Activities.Expressions</x:String>
+      <x:String>System.Activities.Validation</x:String>
+      <x:String>System.Activities.XamlIntegration</x:String>
+      <x:String>Microsoft.VisualBasic</x:String>
+      <x:String>Microsoft.VisualBasic.Activities</x:String>
+      <x:String>System</x:String>
+      <x:String>System.Collections</x:String>
+      <x:String>System.Collections.Generic</x:String>
+      <x:String>System.Data</x:String>
+      <x:String>System.Diagnostics</x:String>
+      <x:String>System.Drawing</x:String>
+      <x:String>System.IO</x:String>
+      <x:String>System.Linq</x:String>
+      <x:String>System.Net.Mail</x:String>
+      <x:String>System.Xml</x:String>
+      <x:String>System.Xml.Linq</x:String>
+      <x:String>UiPath.Core</x:String>
+      <x:String>UiPath.Core.Activities</x:String>
+      <x:String>System.Windows.Markup</x:String>
+      <x:String>System.Runtime.Serialization</x:String>
+      <x:String>System.Runtime.InteropServices</x:String>
+      <x:String>System.Reflection</x:String>
+      <x:String>System.Collections.ObjectModel</x:String>
+      <x:String>GlobalVariablesNamespace</x:String>
+      <x:String>GlobalConstantsNamespace</x:String>
+    </sco:Collection>
+  </TextExpression.NamespacesForImplementation>
+  <TextExpression.ReferencesForImplementation>
+    <scg:List x:TypeArguments="AssemblyReference" Capacity="30">
+      <AssemblyReference>System.Activities</AssemblyReference>
+      <AssemblyReference>Microsoft.VisualBasic</AssemblyReference>
+      <AssemblyReference>mscorlib</AssemblyReference>
+      <AssemblyReference>System.Data</AssemblyReference>
+      <AssemblyReference>System</AssemblyReference>
+      <AssemblyReference>System.Drawing</AssemblyReference>
+      <AssemblyReference>System.Core</AssemblyReference>
+      <AssemblyReference>System.Xml</AssemblyReference>
+      <AssemblyReference>System.Xml.Linq</AssemblyReference>
+      <AssemblyReference>PresentationFramework</AssemblyReference>
+      <AssemblyReference>WindowsBase</AssemblyReference>
+      <AssemblyReference>PresentationCore</AssemblyReference>
+      <AssemblyReference>System.Xaml</AssemblyReference>
+      <AssemblyReference>System.ComponentModel.Composition</AssemblyReference>
+      <AssemblyReference>System.ServiceModel</AssemblyReference>
+      <AssemblyReference>Microsoft.VisualStudio.Services.Common</AssemblyReference>
+      <AssemblyReference>UiPath.System.Activities</AssemblyReference>
+      <AssemblyReference>UiPath.UiAutomation.Activities</AssemblyReference>
+      <AssemblyReference>System.ValueTuple</AssemblyReference>
+      <AssemblyReference>Microsoft.Bcl.AsyncInterfaces</AssemblyReference>
+      <AssemblyReference>UiPath.UIAutomationCore</AssemblyReference>
+      <AssemblyReference>UiPath.OCR.Activities.Design</AssemblyReference>
+      <AssemblyReference>UiPath.Excel</AssemblyReference>
+      <AssemblyReference>UiPath.Mail</AssemblyReference>
+      <AssemblyReference>System.Memory</AssemblyReference>
+      <AssemblyReference>System.Runtime.Serialization</AssemblyReference>
+      <AssemblyReference>NPOI</AssemblyReference>
+      <AssemblyReference>UiPath.System.Activities.Design</AssemblyReference>
+      <AssemblyReference>UiPath.Studio.Constants</AssemblyReference>
+    </scg:List>
+  </TextExpression.ReferencesForImplementation>
+  <Sequence sap2010:Annotation.AnnotationText="Process: SMOS_OmruilactieWitgoed&#xA;&#xA;Doel: Doorfaseren werkprocessen Witgoed Omruilactie (fase 10 → 40 → 90) in Suite.&#xA;Bij ontbrekende BRP-koppeling: werkproces naar WGO2 werkbak (BusinessRuleException).&#xA;&#xA;Stappen:&#xA;1. Openen werkproces uit WGO werkbak (geheimhouding sluiten indien aanwezig)&#xA;2. Controleren BRP-koppeling via taken&#xA;3a. [BRP aanwezig] Doorfaseren naar fase 40&#xA;3b. [BRP aanwezig] Doorfaseren naar fase 90 (automatisch naar werkbak ABV)&#xA;4.  [Geen BRP]    Medewerker wijzigen naar WGO2 uitval BRP → BusinessRuleException&#xA;&#xA;Uitvalpad: Cliënt heeft geen BRP koppeling → 005_Suite_VerplaatsNaarWGO2 + BRE" DisplayName="Process - SMOS_OmruilactieWitgoed" sap:VirtualizedContainerService.HintSize="400,400" sap2010:WorkflowViewState.IdRef="Sequence_1">
+    <sap:WorkflowViewStateService.ViewState>
+      <scg:Dictionary x:TypeArguments="x:String, x:Object">
+        <x:Boolean x:Key="IsExpanded">True</x:Boolean>
+        <x:Boolean x:Key="IsAnnotationDocked">True</x:Boolean>
+      </scg:Dictionary>
+    </sap:WorkflowViewStateService.ViewState>
+    <Sequence.Variables>
+      <Variable x:TypeArguments="x:Boolean" Name="bool_HeeftBRPKoppeling" />
+    </Sequence.Variables>
+
+    <ui:LogMessage DisplayName="Log Start Process" sap:VirtualizedContainerService.HintSize="358,60" sap2010:WorkflowViewState.IdRef="LogMessage_Start" Level="Info" Message="[&quot;In: Process - SMOS_OmruilactieWitgoed&quot;]" />
+
+    <TryCatch DisplayName="TryCatch - Process" sap:VirtualizedContainerService.HintSize="400,900" sap2010:WorkflowViewState.IdRef="TryCatch_1">
+      <sap:WorkflowViewStateService.ViewState>
+        <scg:Dictionary x:TypeArguments="x:String, x:Object">
+          <x:Boolean x:Key="IsExpanded">True</x:Boolean>
+        </scg:Dictionary>
+      </sap:WorkflowViewStateService.ViewState>
+      <TryCatch.Try>
+        <Sequence DisplayName="Try - Hoofdproces" sap:VirtualizedContainerService.HintSize="380,800" sap2010:WorkflowViewState.IdRef="Sequence_Try">
+          <sap:WorkflowViewStateService.ViewState>
+            <scg:Dictionary x:TypeArguments="x:String, x:Object">
+              <x:Boolean x:Key="IsExpanded">True</x:Boolean>
+            </scg:Dictionary>
+          </sap:WorkflowViewStateService.ViewState>
+
+          <!-- Stap 1: Openen werkproces -->
+          <ui:InvokeWorkflowFile DisplayName="001 - Openen werkproces (Suite)" sap:VirtualizedContainerService.HintSize="358,100" sap2010:WorkflowViewState.IdRef="Invoke_001" sap2010:Annotation.AnnotationText="TODO: Wire arguments&#xA;  in_Config → in_Config&#xA;  in_TransactionItem → in_TransactionItem" WorkflowFileName="Processes\001_Suite_OpenWerkproces.xaml">
+            <sap:WorkflowViewStateService.ViewState>
+              <scg:Dictionary x:TypeArguments="x:String, x:Object">
+                <x:Boolean x:Key="IsExpanded">True</x:Boolean>
+                <x:Boolean x:Key="IsAnnotationDocked">True</x:Boolean>
+              </scg:Dictionary>
+            </sap:WorkflowViewStateService.ViewState>
+            <ui:InvokeWorkflowFile.Arguments>
+              <scg:Dictionary x:TypeArguments="x:String, x:Object" />
+            </ui:InvokeWorkflowFile.Arguments>
+          </ui:InvokeWorkflowFile>
+
+          <!-- Stap 2: Controleer BRP koppeling -->
+          <ui:InvokeWorkflowFile DisplayName="002 - Controleer BRP koppeling (Suite)" sap:VirtualizedContainerService.HintSize="358,100" sap2010:WorkflowViewState.IdRef="Invoke_002" sap2010:Annotation.AnnotationText="TODO: Wire arguments&#xA;  in_Config → in_Config&#xA;  out_HeeftBRPKoppeling → bool_HeeftBRPKoppeling" WorkflowFileName="Processes\002_Suite_ControleerBRP.xaml">
+            <sap:WorkflowViewStateService.ViewState>
+              <scg:Dictionary x:TypeArguments="x:String, x:Object">
+                <x:Boolean x:Key="IsExpanded">True</x:Boolean>
+                <x:Boolean x:Key="IsAnnotationDocked">True</x:Boolean>
+              </scg:Dictionary>
+            </sap:WorkflowViewStateService.ViewState>
+            <ui:InvokeWorkflowFile.Arguments>
+              <scg:Dictionary x:TypeArguments="x:String, x:Object" />
+            </ui:InvokeWorkflowFile.Arguments>
+          </ui:InvokeWorkflowFile>
+
+          <!-- Beslissing: BRP koppeling aanwezig? -->
+          <If DisplayName="Heeft cliënt BRP koppeling?" sap:VirtualizedContainerService.HintSize="358,400" sap2010:WorkflowViewState.IdRef="If_BRP" Condition="[bool_HeeftBRPKoppeling]">
+            <sap:WorkflowViewStateService.ViewState>
+              <scg:Dictionary x:TypeArguments="x:String, x:Object">
+                <x:Boolean x:Key="IsExpanded">True</x:Boolean>
+              </scg:Dictionary>
+            </sap:WorkflowViewStateService.ViewState>
+            <If.Then>
+              <Sequence DisplayName="BRP aanwezig - doorfaseren" sap:VirtualizedContainerService.HintSize="338,300" sap2010:WorkflowViewState.IdRef="Sequence_BRP_Ja">
+                <sap:WorkflowViewStateService.ViewState>
+                  <scg:Dictionary x:TypeArguments="x:String, x:Object">
+                    <x:Boolean x:Key="IsExpanded">True</x:Boolean>
+                  </scg:Dictionary>
+                </sap:WorkflowViewStateService.ViewState>
+
+                <!-- Stap 3a: Faseer naar fase 40 -->
+                <ui:InvokeWorkflowFile DisplayName="003 - Faseer naar fase 40 (Suite)" sap:VirtualizedContainerService.HintSize="318,100" sap2010:WorkflowViewState.IdRef="Invoke_003" sap2010:Annotation.AnnotationText="TODO: Wire arguments&#xA;  in_Config → in_Config" WorkflowFileName="Processes\003_Suite_FaseerNaarFase40.xaml">
+                  <sap:WorkflowViewStateService.ViewState>
+                    <scg:Dictionary x:TypeArguments="x:String, x:Object">
+                      <x:Boolean x:Key="IsExpanded">True</x:Boolean>
+                      <x:Boolean x:Key="IsAnnotationDocked">True</x:Boolean>
+                    </scg:Dictionary>
+                  </sap:WorkflowViewStateService.ViewState>
+                  <ui:InvokeWorkflowFile.Arguments>
+                    <scg:Dictionary x:TypeArguments="x:String, x:Object" />
+                  </ui:InvokeWorkflowFile.Arguments>
+                </ui:InvokeWorkflowFile>
+
+                <!-- Stap 3b: Faseer naar fase 90 -->
+                <ui:InvokeWorkflowFile DisplayName="004 - Faseer naar fase 90 (Suite)" sap:VirtualizedContainerService.HintSize="318,100" sap2010:WorkflowViewState.IdRef="Invoke_004" sap2010:Annotation.AnnotationText="TODO: Wire arguments&#xA;  in_Config → in_Config" WorkflowFileName="Processes\004_Suite_FaseerNaarFase90.xaml">
+                  <sap:WorkflowViewStateService.ViewState>
+                    <scg:Dictionary x:TypeArguments="x:String, x:Object">
+                      <x:Boolean x:Key="IsExpanded">True</x:Boolean>
+                      <x:Boolean x:Key="IsAnnotationDocked">True</x:Boolean>
+                    </scg:Dictionary>
+                  </sap:WorkflowViewStateService.ViewState>
+                  <ui:InvokeWorkflowFile.Arguments>
+                    <scg:Dictionary x:TypeArguments="x:String, x:Object" />
+                  </ui:InvokeWorkflowFile.Arguments>
+                </ui:InvokeWorkflowFile>
+
+              </Sequence>
+            </If.Then>
+            <If.Else>
+              <Sequence DisplayName="Geen BRP - verplaats naar WGO2" sap:VirtualizedContainerService.HintSize="338,200" sap2010:WorkflowViewState.IdRef="Sequence_BRP_Nee">
+                <sap:WorkflowViewStateService.ViewState>
+                  <scg:Dictionary x:TypeArguments="x:String, x:Object">
+                    <x:Boolean x:Key="IsExpanded">True</x:Boolean>
+                  </scg:Dictionary>
+                </sap:WorkflowViewStateService.ViewState>
+
+                <!-- Stap 4: Verplaats naar WGO2 werkbak -->
+                <ui:InvokeWorkflowFile DisplayName="005 - Verplaats naar WGO2 werkbak (Suite)" sap:VirtualizedContainerService.HintSize="318,100" sap2010:WorkflowViewState.IdRef="Invoke_005" sap2010:Annotation.AnnotationText="TODO: Wire arguments&#xA;  in_Config → in_Config" WorkflowFileName="Processes\005_Suite_VerplaatsNaarWGO2.xaml">
+                  <sap:WorkflowViewStateService.ViewState>
+                    <scg:Dictionary x:TypeArguments="x:String, x:Object">
+                      <x:Boolean x:Key="IsExpanded">True</x:Boolean>
+                      <x:Boolean x:Key="IsAnnotationDocked">True</x:Boolean>
+                    </scg:Dictionary>
+                  </sap:WorkflowViewStateService.ViewState>
+                  <ui:InvokeWorkflowFile.Arguments>
+                    <scg:Dictionary x:TypeArguments="x:String, x:Object" />
+                  </ui:InvokeWorkflowFile.Arguments>
+                </ui:InvokeWorkflowFile>
+
+                <Throw DisplayName="Throw BRE - Geen BRP koppeling" sap:VirtualizedContainerService.HintSize="318,60" sap2010:WorkflowViewState.IdRef="Throw_BRE" Exception="[New BusinessRuleException(&quot;Cliënt heeft geen BRP koppeling.&quot;)]" />
+
+              </Sequence>
+            </If.Else>
+          </If>
+
+          <ui:LogMessage DisplayName="Log Process Afgerond" sap:VirtualizedContainerService.HintSize="358,60" sap2010:WorkflowViewState.IdRef="LogMessage_End" Level="Info" Message="[&quot;Process afgerond. HeeftBRPKoppeling: &quot; + bool_HeeftBRPKoppeling.ToString()]" />
+
+        </Sequence>
+      </TryCatch.Try>
+      <TryCatch.Catches>
+        <Catch x:TypeArguments="ui:BusinessRuleException">
+          <ActivityAction x:TypeArguments="ui:BusinessRuleException">
+            <ActivityAction.Argument>
+              <DelegateInArgument x:TypeArguments="ui:BusinessRuleException" Name="bre" />
+            </ActivityAction.Argument>
+            <Sequence DisplayName="Catch - BusinessRuleException" sap:VirtualizedContainerService.HintSize="358,200" sap2010:WorkflowViewState.IdRef="Sequence_Catch">
+              <sap:WorkflowViewStateService.ViewState>
+                <scg:Dictionary x:TypeArguments="x:String, x:Object">
+                  <x:Boolean x:Key="IsExpanded">True</x:Boolean>
+                </scg:Dictionary>
+              </sap:WorkflowViewStateService.ViewState>
+              <ui:LogMessage DisplayName="Log BusinessRuleException" sap:VirtualizedContainerService.HintSize="318,60" sap2010:WorkflowViewState.IdRef="LogMessage_BRE" Level="Warn" Message="[&quot;BusinessRuleException: &quot; + bre.Message]" />
+              <Rethrow DisplayName="Rethrow" sap:VirtualizedContainerService.HintSize="318,60" sap2010:WorkflowViewState.IdRef="Rethrow_1" />
+            </Sequence>
+          </ActivityAction>
+        </Catch>
+      </TryCatch.Catches>
+    </TryCatch>
+
+  </Sequence>
+</Activity>

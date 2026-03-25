@@ -1,0 +1,569 @@
+{
+  "system_prompt_version": "1.1",
+  "organisation": "MvR",
+  "purpose": "Claude Code development standards for UiPath REFramework robot projects. Apply these rules whenever scaffolding, generating or reviewing UiPath project files.",
+  "framework": {
+    "default": "MvR_REFramework",
+    "base": "UiPath REFramework (state machine: Initialization \u2192 GetTransactionData \u2192 Process \u2192 EndProcess)",
+    "notes": [
+      "Always use the MvR_REFramework as the default framework, not the plain UiPath REFramework.",
+      "The MvR framework adds: StartTime assignment in Initialization, a temporary config copy sequence above InitAllSettings to prevent file-lock errors during debugging, log mails (start + end), database logging support, and CreateAssets workflow.",
+      "Do not add logic to Main.xaml, SetTransactionStatus.xaml or other framework files. Process logic belongs in Process.xaml and invoked workflows.",
+      "State Machine is used only for the REFramework itself. All other workflows use Sequence (preferred) or Flowchart."
+    ]
+  },
+  "project_naming": {
+    "format": "Department_ProcessName",
+    "casing": "CamelCase",
+    "rules": [
+      "No spaces in project names. Use CamelCase: e.g. Finance_AfrekenenContracten.",
+      "Avoid meaningless suffixes like 'framework'.",
+      "The project folder name matches the project name.",
+      "Do not include version numbers in the project name. Use Git branches/tags for versioning.",
+      "When making changes to a live robot, always work in a DEV branch. Never commit directly to Main.",
+      "GitHub repository naming: KlantNaam_RobotNaam."
+    ]
+  },
+  "workflow_file_naming": {
+    "format": "NNN_AppName_Action.xaml",
+    "examples": [
+      "001_SAP_Login.xaml",
+      "002_SAP_ExtractClientReport.xaml",
+      "101_Outlook_SendEmail.xaml"
+    ],
+    "rules": [
+      "Prefix each workflow file with a 3-digit sequence number.",
+      "Include the application name as the second part of the filename.",
+      "Do not rename workflow files after they are in use \u2014 it causes confusion in logs.",
+      "Group workflow files that belong to the same application in one subfolder under the project root.",
+      "For large application sets, use subfolders within the application folder."
+    ]
+  },
+  "variable_naming": {
+    "casing": "PascalCase",
+    "max_length": 20,
+    "rules": [
+      "Variable names must be meaningful and fully describe the entity they represent.",
+      "Use PascalCase (every word capitalised, no separators): TransactionNumber, FilePath, ReportName.",
+      "Maximum 20 characters. Abbreviate longer words if needed.",
+      "Short names (index, row, file) are acceptable for local/loop scopes.",
+      "Minimise variable scope to the smallest necessary sequence.",
+      "Do NOT use the Default Value field to initialise DataTables or Dictionaries \u2014 use an Assign activity instead."
+    ],
+    "type_prefixes": {
+      "DataTable": "dt_",
+      "Dictionary": "dict_",
+      "Integer": "int_",
+      "Boolean": "bool_",
+      "String": "(no prefix)"
+    },
+    "boolean_convention": "Boolean names must be self-describing so True/False is unambiguous. Example: bool_InlogschermExists. Use 'Not bool_X' rather than 'bool_X = False'.",
+    "dictionary_note": "When using a Dictionary, maintain a Dictionaries.xlsx in the Documentation folder listing all keys."
+  },
+  "argument_naming": {
+    "casing": "PascalCase with direction prefix",
+    "prefixes": {
+      "input": "in_",
+      "output": "out_",
+      "input_output": "io_"
+    },
+    "examples": [
+      "in_Config",
+      "out_InvoiceNumber",
+      "io_RetryNumber",
+      "in_dt_Employees"
+    ],
+    "rules": [
+      "Apply the same naming rules as variables, plus the direction prefix.",
+      "Default values may be used for testing individual workflows, but must be cleared before linking to a calling workflow.",
+      "Always link arguments immediately when invoking a workflow and importing arguments.",
+      "Consider using a Dictionary argument instead of many individual arguments when many values must pass between workflows (pros: fewer arguments, easier to log; cons: less explicit, harder to debug in Locals panel)."
+    ]
+  },
+  "activity_naming": {
+    "rules": [
+      "Activity names must concisely describe the action taken. Keep the action verb: e.g. 'Click Opslaan button', 'Type Into Username field'.",
+      "The default UiPath-generated name is usually insufficient \u2014 rename every activity.",
+      "Assign and If activities especially always need a meaningful name.",
+      "When an activity deviates from default settings (e.g. uses a dynamic selector), add an Annotation explaining why.",
+      "Use the Comment activity and Annotations to explain complex or unusual logic for future maintainers.",
+      "Keep activities that operate on the same variable(s) close together; consider using Multi-Assign.",
+      "If an activity can throw an exception, its name will appear in the log \u2014 a good name makes triage much faster."
+    ]
+  },
+  "workflow_structure": {
+    "preferred_structure": "Sequence",
+    "rules": [
+      "Sequences are preferred for all workflows. They are linear, easy to read and test independently.",
+      "Use Flowchart only when decision logic cannot be expressed cleanly in a Sequence, or when elements would need to be duplicated.",
+      "Keep Flowcharts small and never collapse elements inside them.",
+      "State Machine is reserved exclusively for the REFramework Main.xaml.",
+      "Break large workflows into smaller invoked sub-workflows so each can be tested independently.",
+      "Use mini-sequences within a workflow to visually group related activities.",
+      "Begin every significant sequence/workflow with a Log Message: 'In: WorkflowName'.",
+      "Combine duplicate logic into a single reusable workflow controlled by an in-argument (Boolean, selector info, etc.) rather than maintaining two copies."
+    ]
+  },
+  "decision_logic": {
+    "rules": [
+      "Rename every If activity to describe the condition being evaluated.",
+      "Avoid deeply nested If statements \u2014 refactor to Flowchart or Switch when nesting becomes complex.",
+      "Use Switch Activity when branching on a single variable with multiple known values.",
+      "Use Flow Switch inside Flowcharts for the same purpose (supports 12+ cases).",
+      "Use Pick Branch when multiple parallel UI states may appear and you need to react to whichever appears first. Always include a Throw in the Element-did-not-appear branch."
+    ]
+  },
+  "credentials": {
+    "storage_preference_order": [
+      "1. Never store credentials in plain text in workflows or Config files"
+    ],
+    "rules": [
+      "Retrieve credentials using the Get Credential activity, which returns String (username) and SecureString (password).",
+      "Use Type Secure Text for entering passwords into UI fields.",
+      "To convert SecureString to String when required by an activity: new System.Net.NetworkCredential(\"\", SecurePassword).Password",
+      "Scope credential variables as narrowly as possible \u2014 never broader than needed."
+    ]
+  },
+  "error_handling": {
+    "rules": [
+      "Use Try-Catch for exceptions that need local handling before the Framework's own error handling takes over.",
+      "Multiple Catch blocks are allowed; only the most specific matching exception is caught.",
+      "The Finally block runs regardless of exception \u2014 use for mandatory cleanup.",
+      "Add Try-Catch in Process.xaml when needed. Never add extra logic to the existing Catch in Main.xaml.",
+      "Use Throw with BusinessRuleException for expected business failures: new BusinessRuleException('Description').",
+      "BusinessRuleException = no retry (same situation would recur). SystemException = retry eligible.",
+      "Use Rethrow inside a Catch block when you want to log or act on an exception but still propagate it to the Framework.",
+      "Error messages must never contain sensitive personal data.",
+      "Error messages must be clear, unique and traceable \u2014 but generic enough to be safe.",
+      "Use Retry Scope for sporadic transient failures (e.g. selector not found < 5% of runs) after other fixes are exhausted. Name the Retry Scope meaningfully since its error output is not specific.",
+      "For queue-based robots: use Framework MaxRetry for non-queue retry; use Queue retry settings for queue items. Consider Immediate Retry (MvR framework feature) for direct re-attempt without queue cycling.",
+      "Implement Point-of-no-Return logic when a transaction must not be retried after a certain step (e.g. after creating a record).",
+      "XAML only: Never generate a Catch block for generic Exception or System.Exception \u2014 these cause namespace resolution errors in UiPath Studio. Only catch BusinessRuleException explicitly. All other exceptions propagate to the Framework automatically."
+    ]
+  },
+  "configuration": {
+    "config_file": "Data/Config.xlsx",
+    "sheets": {
+      "Settings": "Static values unlikely to change. Hard-coded or config-file stored. Examples: log messages, queue names.",
+      "Assets": "Orchestrator asset names. Values managed in Orchestrator, not in the file itself.",
+      "Constants": "Values that never change and have no benefit being in Orchestrator."
+    },
+    "rules": [
+      "Hard-code only truly static values (e.g. a fixed selector string).",
+      "Store values used in multiple places in Config.xlsx for single-point maintenance.",
+      "Use Orchestrator Assets for anything that may differ between DEV, TEST and PROD \u2014 allows migration without code changes.",
+      "Credential asset names should be stored as a regular Asset in Config so the flow can look up the asset name and then retrieve the credential dynamically.",
+      "The MvR framework includes a CreateAssets workflow that provisions assets from a 'Create asset' sheet in Config to multiple Orchestrator folders in one run.",
+      "A JSON-based config is an alternative to Excel (better version control and API integration, but less intuitive for non-developers).",
+      "Assets specific to one process go in that process's Orchestrator folder. Shared assets go in the root folder."
+    ],
+    "config_sheets": {
+      "Settings": {
+        "columns": [
+          "Name",
+          "Value",
+          "Description"
+        ],
+        "pre_populated_rows": [
+          {
+            "Name": "UseOrchestratorTransactions",
+            "Value": "True",
+            "Description": "Must be True or False"
+          },
+          {
+            "Name": "OrchestratorQueueName",
+            "Value": "<<QUEUE_NAME_FROM_PDD>>",
+            "Description": "Orchestrator Queue Name. Match with server."
+          },
+          {
+            "Name": "logF_BusinessProcessName",
+            "Value": "<<PROCESS_NAME_FROM_PDD>>",
+            "Description": "Groups log data under one business process name"
+          }
+        ],
+        "rules": [
+          "OrchestratorQueueName: derive from PDD process name using Department_ProcessName convention.",
+          "logF_BusinessProcessName: use the process name from the PDD.",
+          "ConfigFileLocation and UseOrchestratorTransactions: always include with default values."
+        ]
+      },
+      "Constants": {
+        "columns": [
+          "Name",
+          "Value",
+          "Description"
+        ],
+        "pre_populated_rows": [
+          {
+            "Name": "ProjectWithDispatcher",
+            "Value": "False",
+            "Description": "If the project has a dispatcher, then getqueueitems in GetTransactionData, otherwise AddTransactionItem"
+          },
+          {
+            "Name": "QueueRetry",
+            "Value": "False",
+            "Description": "If true, Orchestrator QueueRetry is used"
+          },
+          {
+            "Name": "MaxRetryNumber_FrameworkRetry",
+            "Value": 0,
+            "Description": "Must be 0 if working with Orchestrator queues"
+          },
+          {
+            "Name": "MaxConsecutiveSystemExceptions",
+            "Value": 0,
+            "Description": "Set to 0 to disable consecutive exception limit"
+          },
+          {
+            "Name": "ExScreenshotsFolderPath",
+            "Value": "Exceptions_Screenshots",
+            "Description": "Relative path for exception screenshots"
+          },
+          {
+            "Name": "LogMessage_GetTransactionData",
+            "Value": "Processing Transaction Number: ",
+            "Description": "Static logging message prefix"
+          },
+          {
+            "Name": "LogMessage_GetTransactionDataError",
+            "Value": "Error getting transaction data for Transaction Number: ",
+            "Description": "Static logging message prefix"
+          },
+          {
+            "Name": "LogMessage_Success",
+            "Value": "Transaction Successful.",
+            "Description": "Logged on successful transaction"
+          },
+          {
+            "Name": "LogMessage_BusinessRuleException",
+            "Value": "Business rule exception. ",
+            "Description": "Logged on BusinessRuleException"
+          },
+          {
+            "Name": "LogMessage_ApplicationException",
+            "Value": "System exception. ",
+            "Description": "Logged on ApplicationException"
+          },
+          {
+            "Name": "ExceptionMessage_ConsecutiveErrors",
+            "Value": "The maximum number of consecutive system exceptions was reached. ",
+            "Description": "Logged when MaxConsecutiveSystemExceptions is reached"
+          }
+        ],
+        "rules": [
+          "Always include all default Constants rows \u2014 they are required by the MvR framework.",
+          "Set ProjectWithDispatcher to True only if the PDD describes a dispatcher/performer split.",
+          "Set QueueRetry to True only if the PDD explicitly requires Orchestrator queue retry."
+        ]
+      },
+      "Assets": {
+        "columns": [
+          "Name",
+          "Asset",
+          "Folder",
+          "Description (Assets will always overwrite other config)"
+        ],
+        "pre_populated_rows": [
+          {
+            "Name": "MaxTransactions",
+            "Asset": "MaxTransactions",
+            "Folder": "",
+            "Description": "Must be integer, or INPUTDIALOG, or ALL (unlimited)"
+          },
+          {
+            "Name": "Folder_Temp",
+            "Asset": "Folder_Temp",
+            "Folder": "",
+            "Description": ""
+          },
+          {
+            "Name": "Folder_Log",
+            "Asset": "Folder_Log",
+            "Folder": "",
+            "Description": ""
+          },
+          {
+            "Name": "LogMessageAddress",
+            "Asset": "LogMessageAddress",
+            "Folder": "",
+            "Description": "A single dash will be converted to Nothing by the framework"
+          }
+        ],
+        "rules": [
+          "Name column: the key used in the config dictionary inside workflows.",
+          "Asset column: the exact Orchestrator asset name (follows AppName_Purpose convention).",
+          "Folder column: the Orchestrator folder path. Leave empty for process-default folder.",
+          "For every credential identified in the PDD: add one row with the asset name. The asset name is then used in the workflow to call Get Credential.",
+          "For every application URL, environment setting or configurable value in the PDD: add one row.",
+          "Asset naming: AppName_Purpose \u2014 e.g. SAP_Credential, SAP_URL, RXMission_ClientID."
+        ]
+      },
+      "CreateAssets": {
+        "columns": [
+          "Name",
+          "ValueType",
+          "Value",
+          "CreateAsset",
+          "Comments"
+        ],
+        "value_types": [
+          "Text",
+          "Integer",
+          "Boolean",
+          "Credential"
+        ],
+        "pre_populated_rows": [
+          {
+            "Name": "MaxTransactions",
+            "ValueType": "Text",
+            "Value": "ALL",
+            "CreateAsset": "True",
+            "Comments": ""
+          },
+          {
+            "Name": "Folder_Temp",
+            "ValueType": "Text",
+            "Value": "Data\\Temp",
+            "CreateAsset": "True",
+            "Comments": ""
+          },
+          {
+            "Name": "Folder_Log",
+            "ValueType": "Text",
+            "Value": "Data\\Log",
+            "CreateAsset": "True",
+            "Comments": ""
+          },
+          {
+            "Name": "LogMessageAddress",
+            "ValueType": "Text",
+            "Value": "-",
+            "CreateAsset": "True",
+            "Comments": "A single dash will be converted to Nothing by the framework"
+          }
+        ],
+        "rules": [
+          "Every asset in the Assets sheet must also have a corresponding row in CreateAssets.",
+          "Credential assets: ValueType = Credential, Value = empty string (filled manually before first run), CreateAsset = True.",
+          "Text assets with a known default from the PDD: fill Value directly.",
+          "Text assets without a known value: use a placeholder like <<FILL_BEFORE_FIRST_RUN>>.",
+          "CreateAsset column: always True for new project scaffolding.",
+          "Asset Name must exactly match the Asset column value in the Assets sheet.",
+          "Comments: copy the Description from the Assets sheet for traceability."
+        ]
+      },
+      "LogMessageHtml": {
+        "note": "Pre-populate from PDD process name and department. Key fields: [var_subject], [var_procesnaam], [var_afzender].",
+        "columns": [
+          "variable",
+          "replace with",
+          "description"
+        ],
+        "pdd_derived_fields": [
+          {
+            "variable": "[var_subject]",
+            "source": "derive from PDD process name: RPA-proces - <<ProcessName>>"
+          },
+          {
+            "variable": "[var_procesnaam]",
+            "source": "process name from PDD"
+          },
+          {
+            "variable": "[var_afzender]",
+            "source": "Virtual Assistant RPA (default)"
+          }
+        ]
+      },
+      "LogmailAttachment": {
+        "note": "Add one row per transaction output field identified in the PDD. KeyTransactionDetails column = dictionary key name used in TransactionDetails in the workflow. Reserved words that cannot be used as column names: Transactienummer, Status, Toelichting, TransactionID.",
+        "columns": [
+          "KeyTransactionDetails",
+          "Description",
+          "General Comments"
+        ]
+      }
+    }
+  },
+  "logging": {
+    "rules": [
+      "Begin every important workflow/sequence with: Log Message \u2014 'In: WorkflowName' at Info level.",
+      "Use Trace level for intermediate debug log messages so they do not pollute normal Info logs.",
+      "Log messages must contain enough context to identify the transaction and state.",
+      "NEVER log sensitive personal data in Orchestrator Cloud log messages.",
+      "Never use queue item Reference or Specific Content fields for personal data.",
+      "The MvR framework supports optional SQL database logging. Activate by setting asset Db_UseConnection = true and providing Db_GetCredentialsAssetName.",
+      "Database table additions must follow the existing schema: [NameVariable] [typevariable](255) NULL."
+    ]
+  },
+  "orchestrator": {
+    "asset_naming": {
+      "format": "AppName_Purpose",
+      "examples": [
+        "RXMission_Credential",
+        "RXMission_URL",
+        "SAP_ClientID"
+      ],
+      "rules": [
+        "Begin with the application or category name.",
+        "Group by application. Shared assets (credentials, URLs used by multiple processes) go in the root Orchestrator folder.",
+        "Process-specific assets go in the process's own Orchestrator subfolder."
+      ]
+    },
+    "queue_naming": {
+      "format": "Department_ProcessName",
+      "rules": [
+        "Typically one queue per process, same name as the process.",
+        "Queue names appear in dashboards \u2014 keep them meaningful.",
+        "Create queues in the correct department subfolder in Orchestrator."
+      ]
+    }
+  },
+  "ui_automation": {
+    "input_method_preference": [
+      "1. SimulateClick / SimulateType (fastest, works in background)",
+      "2. SendWindowMessages (fast, works in background)",
+      "3. Hardware events (most compatible, requires visible window)"
+    ],
+    "selector_rules": [
+      "Selectors must work consistently across DEV, TEST and PROD environments and regardless of logged-in username.",
+      "Replace dynamic/variable parts of attribute values with wildcards (*).",
+      "Remove attributes whose entire value is a wildcard \u2014 they add no selectivity.",
+      "Avoid idx except for small stable values (1 or 2).",
+      "Avoid CSS-based attributes.",
+      "Use aaname (accessible name) where possible \u2014 it is human-readable and helps interpret logs.",
+      "Add containers (Attach Browser, Attach Window) to scope partial selectors. This is faster than full selectors and easier to maintain.",
+      "Use Anchor or Find Relative Element when a direct selector cannot be made reliable.",
+      "Use fuzzy selectors for elements where minor UI changes (capitalisation, typos) are expected, but verify accuracy with a subsequent Find Element.",
+      "Annotate any non-standard selector with an explanation."
+    ],
+    "synchronisation": [
+      "Prefer Check App State (modern) over Element Exists for conditional UI waits \u2014 it combines the check with True/False branches.",
+      "Use Find Element (classic) to block until an element appears and throw a SystemException if it does not \u2014 equivalent to a mandatory wait.",
+      "Element Exists never throws \u2014 use only when the absence of an element is an acceptable outcome.",
+      "Add Verify Execution to Click/TypeInto activities as a replacement for Find Element + Retry Scope where applicable.",
+      "Use Pick Branch for parallel UI state detection to avoid timeout overhead on the happy flow.",
+      "Use DelayMS sparingly \u2014 prefer explicit element waits."
+    ],
+    "background_automation": [
+      "For unattended robots sharing a desktop: use SimulateType, SimulateClick and SendWindowMessages.",
+      "Use SetText, Check and SelectItem for background data entry.",
+      "GetText, GetFullText and WebScraping work in background.",
+      "Consider Picture-in-Picture (PiP) if the environment supports it."
+    ]
+  },
+  "source_control": {
+    "platform": "GitHub",
+    "repository_naming": "KlantNaam_RobotNaam",
+    "rules": [
+      "One repository per robot.",
+      "Work in a DEV branch when the robot is live. Never commit directly to Main while in production.",
+      "Push intermediate versions as commits rather than using folder version numbers.",
+      "Project folder name stays constant \u2014 versioning is managed through Git, not the folder name."
+    ]
+  },
+  "library_components": {
+    "repository": "MvR_Library_AppName (one repo per application)",
+    "rules": [
+      "Reusable workflow components are stored in the MvR library.",
+      "Any value that could vary between clients or environments must be an in-argument \u2014 never hard-coded.",
+      "Library components must be generically built so they work across different clients using the same application.",
+      "When a process step matches a library component, always invoke the library component rather than rebuilding from scratch."
+    ]
+  },
+  "email_activities": {
+    "options_in_preference_order": [
+      "Office 365 Outlook (Graph API \u2014 most modern, works with App Id & Secret or modern auth)",
+      "Exchange (direct server connection \u2014 stable, needs credentials and server details)",
+      "SMTP (send-only, simple but limited)",
+      "Outlook Desktop activities (legacy, avoid if possible \u2014 can be unstable)"
+    ],
+    "log_mail_rules": [
+      "Send a start mail to the key user for robots that trigger automatically, for critical processes, or when the key user needs to know timing.",
+      "Send a business end-mail to the key user with process results.",
+      "Send a separate management end-mail (beheer mail) to administrators \u2014 must not contain personal data.",
+      "Never include personal/sensitive data in any log mail, even to key users.",
+      "Customise mail appearance (background, footer, robot name, subject) via Config where possible."
+    ]
+  },
+  "privacy_and_security": {
+    "rules": [
+      "Never log sensitive personal data in Orchestrator Cloud (log messages, queue item reference, queue item specific content, assets).",
+      "Never store credentials in plain text in workflows or config files.",
+      "Credential variables must have the minimum necessary scope.",
+      "When recording process sessions for documentation, ensure test data contains no real personal information. Use black rectangles (not blur) to redact sensitive data in screenshots \u2014 blur is reversible."
+    ]
+  },
+  "project_json_rules": {
+    "required_fields": [
+      "projectId must be a valid non-empty GUID (xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx). Generate a fresh random GUID when scaffolding \u2014 never leave it as an empty string.",
+      "entryPoints[0].uniqueId must be a valid non-empty GUID. Generate a fresh random GUID when scaffolding \u2014 never leave it as an empty string.",
+      "main must be 'Main.xaml'.",
+      "expressionLanguage must be 'VisualBasic'.",
+      "targetFramework must be 'Windows'.",
+      "schemaVersion must be '4.0'.",
+      "runtimeOptions.isAttended must reflect the process type from the PDD (false for unattended robots)."
+    ],
+    "guid_generation": "Always produce two distinct random GUIDs when scaffolding project.json: one for projectId and one for entryPoints[0].uniqueId. Use PowerShell ([System.Guid]::NewGuid().ToString()) or any other method. Never copy GUIDs from another project.json and never leave them as empty strings."
+  },
+  "process_xaml_scaffolding": {
+    "description": "Process.xaml must be generated as fully as possible from the PDD. Do not put TODO placeholders where actual structure can be derived. Sub-workflow stubs carry the TODOs for implementation; Process.xaml carries the orchestration logic.",
+    "rules": [
+      "Root Sequence: annotation summarising the process name, numbered flow steps derived from PDD, and uitvalpad (BRE path) if present. Set IsAnnotationDocked: True.",
+      "Variables block: declare all data variables that flow between sub-workflows. Derive names and types from the PDD (e.g. BSN as String, bool_IsClientBekend as Boolean). Use type prefixes per variable_naming rules.",
+      "First activity: LogMessage at Info level — 'In: Process - ProjectName'.",
+      "Wrap the main flow in a TryCatch with DisplayName 'TryCatch - Process'.",
+      "Try block: Sequence DisplayName 'Try - Hoofdproces' containing one InvokeWorkflowFile per process step in PDD order.",
+      "Each InvokeWorkflowFile: DisplayName = 'NNN - Description (AppName)', WorkflowFileName = correct relative path, Arguments = empty Dictionary stub, Annotation = 'TODO: Wire arguments' followed by each expected in_/out_/io_ argument and the local variable it maps to.",
+      "Conditional logic from PDD: generate If or nested If activities with Condition derived from a bool_ variable. Place the relevant InvokeWorkflowFile calls in Then/Else branches.",
+      "Final activity in Try block: LogMessage at Info level logging key result variables to confirm success.",
+      "Catch block: catch ui:BusinessRuleException only. Contents: LogMessage Warn with exception.Message, then InvokeWorkflowFile for any error-handling workflow identified in the PDD (with argument wiring TODO annotation), then Rethrow.",
+      "Never add a Catch for generic Exception or System.Exception.",
+      "XML comments (<!-- Stap N: ... -->) may be used inside Process.xaml as structural separators between invoke steps — they are for the XAML source reader, not the designer. They are acceptable here because the InvokeWorkflowFile annotations serve the Studio developer."
+    ]
+  },
+  "claude_code_instructions": {
+    "scaffolding": "Follow .claude/commands/scaffold-robot.md for the full step-by-step scaffolding procedure. That file is the authoritative source — do not derive scaffolding steps from this file.",
+    "xaml_generation": "See xaml_generation_rules section below — that is the canonical source for all XAML generation rules."
+  },
+  "xaml_generation_rules": {
+    "critical_rules": [
+      "NEVER reference Exception types using the x: XAML namespace prefix. Exception lives in the System namespace, not the XAML x: namespace.",
+      "NEVER generate a generic Catch(Exception) block in XAML. Unhandled exceptions bubble up naturally to the REFramework, which handles retry logic. Do not try to catch them explicitly.",
+      "In Process.xaml, only catch BusinessRuleException explicitly. All other exceptions should propagate to the Framework.",
+      "BusinessRuleException is referenced as: ui:BusinessRuleException where ui is xmlns:ui=\"http://schemas.uipath.com/workflow/activities\". Never use clr-namespace:UiPath.Core;assembly=UiPath.Core \u2014 it does not resolve in current UiPath Studio versions.",
+      "When generating Try-Catch in XAML, always verify the Catch type resolves to a fully qualified .NET type via the correct namespace alias, never via x: or bare type names.",
+      "If in doubt about a type reference in XAML, omit the Catch block entirely rather than generating an invalid reference. The Framework safety net is sufficient.",
+      "Do not generate Catch blocks for System.Exception, System.ApplicationException or any generic base exception class \u2014 these cause namespace resolution errors in UiPath Studio.",
+      "Only generate Catch blocks you are certain will resolve correctly (e.g. BusinessRuleException). Leave a TODO comment for any other exception handling the developer should add in UiPath Studio."
+    ],
+    "valid_catch_example": "Catch x:TypeArguments=\"ui:BusinessRuleException\" \u2014 where ui namespace is declared as xmlns:ui=\"http://schemas.uipath.com/workflow/activities\". This is the only correct alias. NEVER use clr-namespace:UiPath.Core;assembly=UiPath.Core for BusinessRuleException \u2014 it does not resolve in current UiPath Studio versions.",
+    "invalid_patterns_to_avoid": [
+      "Catch(Exception) with x:Exception \u2014 INVALID",
+      "DelegateInArgument(Exception) with x: prefix \u2014 INVALID",
+      "ActivityAction(Exception) with x: prefix \u2014 INVALID",
+      "Any bare type name in a generic type argument inside XAML without a proper CLR namespace alias \u2014 INVALID"
+    ]
+  },
+  "todo_in_xaml": {
+    "rules": [
+      "NEVER use XML comments (<!-- TODO -->) for developer instructions. XML comments are invisible in UiPath Studio's designer and provide no value to the developer working in Studio.",
+      "Every stub activity gets a meaningful DisplayName describing what the activity does. Never put [TODO] or any placeholder text in the DisplayName.",
+      "Put TODO instructions in sap2010:Annotation.AnnotationText on the activity — both on the workflow root Sequence and on individual placeholder Sequences inside it.",
+      "Always set IsAnnotationDocked: True in the ViewState of any annotated element so the annotation opens automatically when the developer opens the file.",
+      "Annotation text structure: 1) workflow file name (root only), 2) Doel (purpose from PDD), 3) Input/Output arguments (root only), 4) numbered TODO steps the developer must complete in UiPath Studio.",
+      "Use &#xA; for newlines and &quot; for double-quotes inside annotation attribute values.",
+      "Derive the numbered TODO steps directly from the PDD process description \u2014 be specific about which activities, selectors and config keys are involved.",
+      "The sap2010 namespace must be declared on the root Activity element: xmlns:sap2010=\"http://schemas.microsoft.com/netfx/2010/xaml/activities/presentation\"."
+    ],
+    "xaml_example": {
+      "description": "Correct pattern: meaningful DisplayName on every activity, TODO instructions in the annotation",
+      "root_sequence": "<Sequence DisplayName=\"001_Suite_Login\" sap2010:Annotation.AnnotationText=\"001_Suite_Login&#xA;&#xA;Doel: Log in op Suite via Edge.&#xA;&#xA;Input:&#xA;  in_Config &#x2192; configuratiewoordenboek&#xA;&#xA;TODO - Uit te voeren in UiPath Studio:&#xA;1. Get Credential via in_Config(&quot;Suite_Credential&quot;)&#xA;2. Open Edge en navigeer naar in_Config(&quot;Suite_URL&quot;)&#xA;3. TypeInto gebruikersnaamveld (selector vereist)&#xA;4. TypeSecureText wachtwoordveld (selector vereist)&#xA;5. Click inlogknop (selector vereist)&#xA;6. Check App State: wacht tot hoofdpagina geladen is\" sap2010:WorkflowViewState.IdRef=\"Sequence_1\">",
+      "view_state_on_root": "<sap:WorkflowViewStateService.ViewState><scg:Dictionary x:TypeArguments=\"x:String, x:Object\"><x:Boolean x:Key=\"IsExpanded\">True</x:Boolean><x:Boolean x:Key=\"IsAnnotationDocked\">True</x:Boolean></scg:Dictionary></sap:WorkflowViewStateService.ViewState>",
+      "placeholder_activity": "<Sequence DisplayName=\"Inloggen op Suite\" sap2010:Annotation.AnnotationText=\"TODO:&#xA;1. Get Credential via in_Config(&quot;Suite_Credential&quot;)&#xA;2. Navigeer naar in_Config(&quot;Suite_URL&quot;) in Edge&#xA;3. TypeInto gebruikersnaamveld (selector vereist)&#xA;4. TypeSecureText wachtwoordveld (selector vereist)&#xA;5. Click inlogknop (selector vereist)\"><sap:WorkflowViewStateService.ViewState><scg:Dictionary x:TypeArguments=\"x:String, x:Object\"><x:Boolean x:Key=\"IsExpanded\">True</x:Boolean><x:Boolean x:Key=\"IsAnnotationDocked\">True</x:Boolean></scg:Dictionary></sap:WorkflowViewStateService.ViewState></Sequence>"
+    },
+    "invalid_patterns": [
+      "<!-- TODO: Add selector in UiPath Studio --> \u2014 INVALID: invisible in Studio designer",
+      "DisplayName=\"[TODO] Voeg selector toe\" \u2014 INVALID: [TODO] prefix belongs in the annotation, not the name"
+    ]
+  }
+}

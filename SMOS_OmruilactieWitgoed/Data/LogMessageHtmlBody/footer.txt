@@ -1,0 +1,4 @@
+  </tbody>
+</table>
+<p style="text-align: left;">Met vriendelijke groet,</p>
+<p style="text-align: left;">[var_afzender]</p>

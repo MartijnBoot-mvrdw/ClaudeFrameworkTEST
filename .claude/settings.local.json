@@ -1,0 +1,31 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(cp -r MvR_REFramework/Data BOA_AanmakenWerkprocessenBW/)",
+      "Bash(cp -r MvR_REFramework/Documentation BOA_AanmakenWerkprocessenBW/)",
+      "Bash(cp -r MvR_REFramework/Framework BOA_AanmakenWerkprocessenBW/)",
+      "Bash(cp MvR_REFramework/Main.xaml BOA_AanmakenWerkprocessenBW/)",
+      "Bash(cp MvR_REFramework/Main.xaml.json BOA_AanmakenWerkprocessenBW/)",
+      "Bash(cp MvR_REFramework/Process.xaml BOA_AanmakenWerkprocessenBW/)",
+      "Bash(cp MvR_REFramework/Sandbox.xaml BOA_AanmakenWerkprocessenBW/)",
+      "Bash(cp MvR_REFramework/project.json BOA_AanmakenWerkprocessenBW/)",
+      "Bash(cp MvR_REFramework/entry-points.json BOA_AanmakenWerkprocessenBW/)",
+      "Bash(mkdir -p \"c:\\\\Users\\\\MartijnBoot\\\\Documents\\\\GitHub-MvRDW\\\\ClaudeFrameworkTEST\\\\ClaudeFrameworkTEST\\\\SMOS_ActieveDebiteuren\\\\Data\")",
+      "Bash(mkdir -p \"c:\\\\Users\\\\MartijnBoot\\\\Documents\\\\GitHub-MvRDW\\\\ClaudeFrameworkTEST\\\\ClaudeFrameworkTEST\\\\SMOS_ActieveDebiteuren\\\\Documentation\")",
+      "Bash(mkdir -p \"c:\\\\Users\\\\MartijnBoot\\\\Documents\\\\GitHub-MvRDW\\\\ClaudeFrameworkTEST\\\\ClaudeFrameworkTEST\\\\SMOS_ActieveDebiteuren\\\\Framework\")",
+      "Bash(mkdir -p \"c:\\\\Users\\\\MartijnBoot\\\\Documents\\\\GitHub-MvRDW\\\\ClaudeFrameworkTEST\\\\ClaudeFrameworkTEST\\\\SMOS_ActieveDebiteuren\\\\Processes\")",
+      "Bash(py --version)",
+      "Bash(powershell -Command 'Get-Command Excel')",
+      "Bash(powershell -Command \"$xl = New-Object -ComObject Excel.Application; Write-Host ''Excel available''; $xl.Quit\\(\\)\")",
+      "Bash(powershell -Command \":*)",
+      "Bash(powershell -Command \"[System.Guid]::NewGuid\\(\\).ToString\\(\\); [System.Guid]::NewGuid\\(\\).ToString\\(\\)\")",
+      "Bash(BASE=\"c:/Users/MartijnBoot/Documents/GitHub-MvRDW/ClaudeFrameworkTEST/ClaudeFrameworkTEST\")",
+      "Bash(cp \"$BASE/MvR_REFramework/Data/Config.xlsx\" \"$BASE/SMOS_OmruilactieWitgoed/Data/Config.xlsx\")",
+      "Bash(SRC=\"$BASE/MvR_REFramework\")",
+      "Bash(DEST=\"$BASE/SMOS_OmruilactieWitgoed\")",
+      "Bash(__NEW_LINE_39cd354896fc8f9c__ mkdir:*)",
+      "Bash(__NEW_LINE_39cd354896fc8f9c__ cp:*)",
+      "Bash(cp \"$SRC/Data/Config.xlsx\" \"$DEST/Data/Config.xlsx\")"
+    ]
+  }
+}

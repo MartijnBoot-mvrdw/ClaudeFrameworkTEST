@@ -1,0 +1,76 @@
+<Activity mc:Ignorable="sap sap2010" x:Class="_004_Suite_FaseerNaarFase90" xmlns="http://schemas.microsoft.com/netfx/2009/xaml/activities" xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" xmlns:sap="http://schemas.microsoft.com/netfx/2009/xaml/activities/presentation" xmlns:sap2010="http://schemas.microsoft.com/netfx/2010/xaml/activities/presentation" xmlns:scg="clr-namespace:System.Collections.Generic;assembly=System.Private.CoreLib" xmlns:sco="clr-namespace:System.Collections.ObjectModel;assembly=System.Private.CoreLib" xmlns:ui="http://schemas.uipath.com/workflow/activities" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+  <x:Members>
+    <x:Property Name="in_Config" Type="InArgument(scg:Dictionary(x:String, x:String))" />
+  </x:Members>
+  <VisualBasic.Settings>
+    <x:Null />
+  </VisualBasic.Settings>
+  <sap:VirtualizedContainerService.HintSize>1189,641</sap:VirtualizedContainerService.HintSize>
+  <sap2010:WorkflowViewState.IdRef>_004_Suite_FaseerNaarFase90_1</sap2010:WorkflowViewState.IdRef>
+  <TextExpression.NamespacesForImplementation>
+    <sco:Collection x:TypeArguments="x:String">
+      <x:String>System.Activities</x:String>
+      <x:String>System.Activities.Statements</x:String>
+      <x:String>System.Activities.Expressions</x:String>
+      <x:String>System.Activities.Validation</x:String>
+      <x:String>System.Activities.XamlIntegration</x:String>
+      <x:String>Microsoft.VisualBasic</x:String>
+      <x:String>Microsoft.VisualBasic.Activities</x:String>
+      <x:String>System</x:String>
+      <x:String>System.Collections</x:String>
+      <x:String>System.Collections.Generic</x:String>
+      <x:String>System.Data</x:String>
+      <x:String>System.Diagnostics</x:String>
+      <x:String>System.Drawing</x:String>
+      <x:String>System.IO</x:String>
+      <x:String>System.Linq</x:String>
+      <x:String>System.Net.Mail</x:String>
+      <x:String>System.Xml</x:String>
+      <x:String>System.Xml.Linq</x:String>
+      <x:String>UiPath.Core</x:String>
+      <x:String>UiPath.Core.Activities</x:String>
+      <x:String>System.Windows.Markup</x:String>
+      <x:String>System.Runtime.Serialization</x:String>
+    </sco:Collection>
+  </TextExpression.NamespacesForImplementation>
+  <TextExpression.ReferencesForImplementation>
+    <sco:Collection x:TypeArguments="AssemblyReference">
+      <AssemblyReference>System.Activities</AssemblyReference>
+      <AssemblyReference>Microsoft.VisualBasic</AssemblyReference>
+      <AssemblyReference>mscorlib</AssemblyReference>
+      <AssemblyReference>System.Data</AssemblyReference>
+      <AssemblyReference>System</AssemblyReference>
+      <AssemblyReference>System.Drawing</AssemblyReference>
+      <AssemblyReference>System.Core</AssemblyReference>
+      <AssemblyReference>System.Xml</AssemblyReference>
+      <AssemblyReference>System.Xml.Linq</AssemblyReference>
+      <AssemblyReference>PresentationFramework</AssemblyReference>
+      <AssemblyReference>WindowsBase</AssemblyReference>
+      <AssemblyReference>PresentationCore</AssemblyReference>
+      <AssemblyReference>System.Xaml</AssemblyReference>
+      <AssemblyReference>System.ComponentModel.Composition</AssemblyReference>
+      <AssemblyReference>System.ServiceModel</AssemblyReference>
+      <AssemblyReference>UiPath.System.Activities</AssemblyReference>
+      <AssemblyReference>UiPath.UiAutomation.Activities</AssemblyReference>
+      <AssemblyReference>Microsoft.Bcl.AsyncInterfaces</AssemblyReference>
+      <AssemblyReference>System.Runtime.Serialization</AssemblyReference>
+    </sco:Collection>
+  </TextExpression.ReferencesForImplementation>
+  <Sequence DisplayName="004_Suite_FaseerNaarFase90" sap2010:Annotation.AnnotationText="004_Suite_FaseerNaarFase90&#xA;&#xA;Doel: Faseer het werkproces door naar fase 90. Stel afdoening in op &quot;10 Toekenning&quot; en vink &quot;Automatisch beslissen&quot; aan. Het werkproces wordt automatisch verplaatst naar werkbak ABV.&#xA;&#xA;Input:&#xA;  in_Config → configuratiewoordenboek&#xA;&#xA;TODO - Uit te voeren in UiPath Studio:&#xA;1. Click knop &quot;Wijzigen fase&quot; in het geopende werkproces (selector vereist)&#xA;2. Check App State: wacht tot fase-dialoog met afdoening-dropdown zichtbaar is&#xA;3. SelectItem op het afdoening-dropdown: kies &quot;10 Toekenning&quot; (selector vereist)&#xA;4. Check checkbox &quot;Automatisch beslissen&quot; (selector vereist, gebruik Check activity)&#xA;5. Click &quot;Opslaan en sluiten&quot; (diskette, selector vereist)&#xA;6. Check App State: werkproces verdwenen uit huidige werkbak (nu in werkbak ABV)" sap:VirtualizedContainerService.HintSize="376,400" sap2010:WorkflowViewState.IdRef="Sequence_1">
+    <sap:WorkflowViewStateService.ViewState>
+      <scg:Dictionary x:TypeArguments="x:String, x:Object">
+        <x:Boolean x:Key="IsExpanded">True</x:Boolean>
+        <x:Boolean x:Key="IsAnnotationDocked">True</x:Boolean>
+      </scg:Dictionary>
+    </sap:WorkflowViewStateService.ViewState>
+    <ui:LogMessage DisplayName="Log Start 004_Suite_FaseerNaarFase90" sap:VirtualizedContainerService.HintSize="334,60" sap2010:WorkflowViewState.IdRef="LogMessage_1" Level="Info" Message="[&quot;In: 004_Suite_FaseerNaarFase90&quot;]" />
+    <Sequence DisplayName="Fase wijzigen naar 90 met afdoening en automatisch beslissen" sap2010:Annotation.AnnotationText="TODO:&#xA;1. Click &quot;Wijzigen fase&quot; (selector vereist)&#xA;2. SelectItem afdoening = &quot;10 Toekenning&quot; (selector vereist)&#xA;3. Check &quot;Automatisch beslissen&quot; checkbox (selector vereist)&#xA;4. Click &quot;Opslaan en sluiten&quot; (diskette, selector vereist)&#xA;5. Check App State: werkproces in werkbak ABV" sap:VirtualizedContainerService.HintSize="334,200" sap2010:WorkflowViewState.IdRef="Sequence_Fase90">
+      <sap:WorkflowViewStateService.ViewState>
+        <scg:Dictionary x:TypeArguments="x:String, x:Object">
+          <x:Boolean x:Key="IsExpanded">True</x:Boolean>
+          <x:Boolean x:Key="IsAnnotationDocked">True</x:Boolean>
+        </scg:Dictionary>
+      </sap:WorkflowViewStateService.ViewState>
+    </Sequence>
+  </Sequence>
+</Activity>

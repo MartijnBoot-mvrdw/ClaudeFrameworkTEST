@@ -10,54 +10,60 @@
   <sap2010:WorkflowViewState.IdRef>_001_Suite_OpenWerkproces_1</sap2010:WorkflowViewState.IdRef>
   <TextExpression.NamespacesForImplementation>
     <sco:Collection x:TypeArguments="x:String">
-      <x:String>System.Activities</x:String>
-      <x:String>System.Activities.Statements</x:String>
-      <x:String>System.Activities.Expressions</x:String>
-      <x:String>System.Activities.Validation</x:String>
-      <x:String>System.Activities.XamlIntegration</x:String>
+      <x:String>GlobalConstantsNamespace</x:String>
+      <x:String>GlobalVariablesNamespace</x:String>
       <x:String>Microsoft.VisualBasic</x:String>
       <x:String>Microsoft.VisualBasic.Activities</x:String>
       <x:String>System</x:String>
+      <x:String>System.Activities</x:String>
+      <x:String>System.Activities.Expressions</x:String>
+      <x:String>System.Activities.Statements</x:String>
+      <x:String>System.Activities.Validation</x:String>
+      <x:String>System.Activities.XamlIntegration</x:String>
       <x:String>System.Collections</x:String>
       <x:String>System.Collections.Generic</x:String>
+      <x:String>System.Collections.ObjectModel</x:String>
       <x:String>System.Data</x:String>
       <x:String>System.Diagnostics</x:String>
       <x:String>System.Drawing</x:String>
       <x:String>System.IO</x:String>
       <x:String>System.Linq</x:String>
       <x:String>System.Net.Mail</x:String>
+      <x:String>System.Runtime.Serialization</x:String>
+      <x:String>System.Windows.Markup</x:String>
       <x:String>System.Xml</x:String>
       <x:String>System.Xml.Linq</x:String>
       <x:String>UiPath.Core</x:String>
       <x:String>UiPath.Core.Activities</x:String>
-      <x:String>System.Windows.Markup</x:String>
-      <x:String>System.Runtime.Serialization</x:String>
     </sco:Collection>
   </TextExpression.NamespacesForImplementation>
   <TextExpression.ReferencesForImplementation>
     <sco:Collection x:TypeArguments="AssemblyReference">
-      <AssemblyReference>System.Activities</AssemblyReference>
+      <AssemblyReference>Microsoft.Bcl.AsyncInterfaces</AssemblyReference>
       <AssemblyReference>Microsoft.VisualBasic</AssemblyReference>
       <AssemblyReference>mscorlib</AssemblyReference>
-      <AssemblyReference>System.Data</AssemblyReference>
+      <AssemblyReference>PresentationCore</AssemblyReference>
+      <AssemblyReference>PresentationFramework</AssemblyReference>
       <AssemblyReference>System</AssemblyReference>
-      <AssemblyReference>System.Drawing</AssemblyReference>
+      <AssemblyReference>System.Activities</AssemblyReference>
+      <AssemblyReference>System.ComponentModel.Composition</AssemblyReference>
+      <AssemblyReference>System.ComponentModel.TypeConverter</AssemblyReference>
       <AssemblyReference>System.Core</AssemblyReference>
+      <AssemblyReference>System.Data</AssemblyReference>
+      <AssemblyReference>System.Drawing</AssemblyReference>
+      <AssemblyReference>System.Linq</AssemblyReference>
+      <AssemblyReference>System.ObjectModel</AssemblyReference>
+      <AssemblyReference>System.Runtime.Serialization</AssemblyReference>
+      <AssemblyReference>System.ServiceModel</AssemblyReference>
+      <AssemblyReference>System.Xaml</AssemblyReference>
       <AssemblyReference>System.Xml</AssemblyReference>
       <AssemblyReference>System.Xml.Linq</AssemblyReference>
-      <AssemblyReference>PresentationFramework</AssemblyReference>
-      <AssemblyReference>WindowsBase</AssemblyReference>
-      <AssemblyReference>PresentationCore</AssemblyReference>
-      <AssemblyReference>System.Xaml</AssemblyReference>
-      <AssemblyReference>System.ComponentModel.Composition</AssemblyReference>
-      <AssemblyReference>System.ServiceModel</AssemblyReference>
       <AssemblyReference>UiPath.System.Activities</AssemblyReference>
       <AssemblyReference>UiPath.UiAutomation.Activities</AssemblyReference>
-      <AssemblyReference>Microsoft.Bcl.AsyncInterfaces</AssemblyReference>
-      <AssemblyReference>System.Runtime.Serialization</AssemblyReference>
+      <AssemblyReference>WindowsBase</AssemblyReference>
     </sco:Collection>
   </TextExpression.ReferencesForImplementation>
-  <Sequence DisplayName="001_Suite_OpenWerkproces" sap2010:Annotation.AnnotationText="001_Suite_OpenWerkproces&#xA;&#xA;Doel: Open het werkproces in Suite via de WGO werkbak. Sluit de geheimhoudingsmelding indien aanwezig.&#xA;&#xA;Input:&#xA;  in_Config → configuratiewoordenboek (o.a. Suite_URL)&#xA;  in_TransactionItem → werkproces-ID / queue item reference&#xA;&#xA;TODO - Uit te voeren in UiPath Studio:&#xA;1. Attach Browser op Edge met Suite (selector vereist, gebruik in_Config(&quot;Suite_URL&quot;))&#xA;2. Navigeer naar de WGO werkbak of gebruik de bestaande Suite-sessie&#xA;3. Click op het werkproces in de lijst (selector op basis van in_TransactionItem)&#xA;4. Check App State: wacht tot werkproces geopend is&#xA;5. Controleer of geheimhoudingsmelding popup aanwezig is (Element Exists of Check App State)&#xA;6. Zo ja: Click OK / sluiten knop op de geheimhoudingsmelding (selector vereist)" sap:VirtualizedContainerService.HintSize="376,400" sap2010:WorkflowViewState.IdRef="Sequence_1">
+  <Sequence sap2010:Annotation.AnnotationText="001_Suite_OpenWerkproces&#xA;&#xA;Doel: Open het werkproces in Suite via de WGO werkbak. Sluit de geheimhoudingsmelding indien aanwezig.&#xA;&#xA;Input:&#xA;  in_Config → configuratiewoordenboek (o.a. Suite_URL)&#xA;  in_TransactionItem → werkproces-ID / queue item reference&#xA;&#xA;TODO - Uit te voeren in UiPath Studio:&#xA;1. Attach Browser op Edge met Suite (selector vereist, gebruik in_Config(&quot;Suite_URL&quot;))&#xA;2. Navigeer naar de WGO werkbak of gebruik de bestaande Suite-sessie&#xA;3. Click op het werkproces in de lijst (selector op basis van in_TransactionItem)&#xA;4. Check App State: wacht tot werkproces geopend is&#xA;5. Controleer of geheimhoudingsmelding popup aanwezig is (Element Exists of Check App State)&#xA;6. Zo ja: Click OK / sluiten knop op de geheimhoudingsmelding (selector vereist)" DisplayName="001_Suite_OpenWerkproces" sap:VirtualizedContainerService.HintSize="376,400" sap2010:WorkflowViewState.IdRef="Sequence_1">
     <sap:WorkflowViewStateService.ViewState>
       <scg:Dictionary x:TypeArguments="x:String, x:Object">
         <x:Boolean x:Key="IsExpanded">True</x:Boolean>
@@ -65,7 +71,7 @@
       </scg:Dictionary>
     </sap:WorkflowViewStateService.ViewState>
     <ui:LogMessage DisplayName="Log Start 001_Suite_OpenWerkproces" sap:VirtualizedContainerService.HintSize="334,60" sap2010:WorkflowViewState.IdRef="LogMessage_1" Level="Info" Message="[&quot;In: 001_Suite_OpenWerkproces&quot;]" />
-    <Sequence DisplayName="Werkproces openen in Suite" sap2010:Annotation.AnnotationText="TODO:&#xA;1. Attach Browser Edge Suite (selector vereist)&#xA;2. Click werkproces in WGO werkbak (selector op in_TransactionItem)&#xA;3. Check App State: werkproces geopend" sap:VirtualizedContainerService.HintSize="334,150" sap2010:WorkflowViewState.IdRef="Sequence_Open">
+    <Sequence sap2010:Annotation.AnnotationText="TODO:&#xA;1. Attach Browser Edge Suite (selector vereist)&#xA;2. Click werkproces in WGO werkbak (selector op in_TransactionItem)&#xA;3. Check App State: werkproces geopend" DisplayName="Werkproces openen in Suite" sap:VirtualizedContainerService.HintSize="334,150" sap2010:WorkflowViewState.IdRef="Sequence_Open">
       <sap:WorkflowViewStateService.ViewState>
         <scg:Dictionary x:TypeArguments="x:String, x:Object">
           <x:Boolean x:Key="IsExpanded">True</x:Boolean>
@@ -73,7 +79,7 @@
         </scg:Dictionary>
       </sap:WorkflowViewStateService.ViewState>
     </Sequence>
-    <Sequence DisplayName="Geheimhoudingsmelding sluiten indien aanwezig" sap2010:Annotation.AnnotationText="TODO:&#xA;1. Check App State (of Element Exists) op geheimhoudingsmelding popup&#xA;2. Zo ja: Click OK knop popup (selector vereist)&#xA;3. Check App State: popup verdwenen" sap:VirtualizedContainerService.HintSize="334,150" sap2010:WorkflowViewState.IdRef="Sequence_Geheimhouding">
+    <Sequence sap2010:Annotation.AnnotationText="TODO:&#xA;1. Check App State (of Element Exists) op geheimhoudingsmelding popup&#xA;2. Zo ja: Click OK knop popup (selector vereist)&#xA;3. Check App State: popup verdwenen" DisplayName="Geheimhoudingsmelding sluiten indien aanwezig" sap:VirtualizedContainerService.HintSize="334,150" sap2010:WorkflowViewState.IdRef="Sequence_Geheimhouding">
       <sap:WorkflowViewStateService.ViewState>
         <scg:Dictionary x:TypeArguments="x:String, x:Object">
           <x:Boolean x:Key="IsExpanded">True</x:Boolean>

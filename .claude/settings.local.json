@@ -25,7 +25,10 @@
       "Bash(DEST=\"$BASE/SMOS_OmruilactieWitgoed\")",
       "Bash(__NEW_LINE_39cd354896fc8f9c__ mkdir:*)",
       "Bash(__NEW_LINE_39cd354896fc8f9c__ cp:*)",
-      "Bash(cp \"$SRC/Data/Config.xlsx\" \"$DEST/Data/Config.xlsx\")"
+      "Bash(cp \"$SRC/Data/Config.xlsx\" \"$DEST/Data/Config.xlsx\")",
+      "Bash(unzip -p \"MvR DW - Solution Design Document - Template.docx\" word/document.xml)",
+      "Bash(grep -v '^$')",
+      "Bash(tr '|' '\\\\n')"
     ]
   }
 }

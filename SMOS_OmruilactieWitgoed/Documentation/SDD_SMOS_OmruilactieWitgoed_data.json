@@ -1,0 +1,186 @@
+{
+  "procesnaam": "Faseren Omruilactie Witgoed",
+  "projectnaam": "SMOS_OmruilactieWitgoed",
+  "afdeling": "SMOS",
+  "datum": "2026-03-26",
+  "beschrijving": "Alle werkprocessen omtrent de witgoed actie doorfaseren van fase 10 naar fase 90. Wanneer een werkproces geen BRP-koppeling heeft, wordt het verplaatst naar de werkbak WGO2 Witgoed Omruilactie uitval BRP.",
+  "frequentie": "Eenmalige bulkactie",
+  "verwacht_aantal_transacties": "Eenmalig 13.000 stuks",
+  "maximale_doorlooptijd": null,
+  "type_robot": "Onbeheerd (queue-based)",
+  "transactietype": "Queue-based",
+  "dispatcher_performer": "Nee",
+  "versie_tabel": [
+    { "versie": "0.1", "datum": "2026-03-26", "auteur": "<<AUTEUR>>", "omschrijving": "Eerste concept op basis van PDD" }
+  ],
+  "stakeholders": [
+    { "rol": "Opdrachtgever",                   "naam_klant": "Patrick Adelaars",           "naam_mvr": "<<ONBEKEND>>" },
+    { "rol": "Proceseigenaar",                  "naam_klant": "Bente Elast / Pettry Backx", "naam_mvr": "<<ONBEKEND>>" },
+    { "rol": "Functioneel-applicatiebeheerder", "naam_klant": "Els Veraa & Angela den Adel","naam_mvr": "<<ONBEKEND>>" },
+    { "rol": "Tester",                          "naam_klant": "<<ONBEKEND>>",               "naam_mvr": "<<ONBEKEND>>" }
+  ],
+  "procesflow": [
+    { "nr": 1, "sub_proces": "OpenEnInloggen",    "applicatie": "Suite", "type": "Geautomatiseerd", "voorganger": "-" },
+    { "nr": 2, "sub_proces": "OpenWerkproces",    "applicatie": "Suite", "type": "Geautomatiseerd", "voorganger": "1" },
+    { "nr": 3, "sub_proces": "ControleerBRP",     "applicatie": "Suite", "type": "Geautomatiseerd", "voorganger": "2" },
+    { "nr": 4, "sub_proces": "FaseerNaarFase40",  "applicatie": "Suite", "type": "Geautomatiseerd", "voorganger": "3" },
+    { "nr": 5, "sub_proces": "FaseerNaarFase90",  "applicatie": "Suite", "type": "Geautomatiseerd", "voorganger": "4" },
+    { "nr": 6, "sub_proces": "VerplaatsNaarWGO2", "applicatie": "Suite", "type": "Geautomatiseerd", "voorganger": "3" }
+  ],
+  "decompositie_prose": "De robot opent Suite via Microsoft Edge en logt in. Per transactie-item (werkproces in fase 10, Witgoed Omruilactie) wordt het werkproces geopend. Vervolgens controleert de robot of de cliënt een BRP-koppeling heeft. Indien ja, wordt het werkproces doorgefaseerd naar fase 40 en vervolgens naar fase 90 (afdoening: 10 Toekenning, automatisch beslissen aan). Indien nee, wordt het werkproces verplaatst naar de werkbak WGO2 Witgoed Omruilactie uitval BRP.",
+  "decompositie_stappen": [
+    "1. OpenEnInloggen — Suite openen via Microsoft Edge en inloggen met credentials uit Orchestrator",
+    "2. OpenWerkproces — werkproces uit de WGO-werkbak openen",
+    "3. ControleerBRP — controleren of cliënt een BRP-koppeling heeft",
+    "4. FaseerNaarFase40 — werkproces doorfaseren naar fase 40",
+    "5. FaseerNaarFase90 — werkproces doorfaseren naar fase 90 (afdoening: 10 Toekenning, automatisch beslissen)",
+    "6. VerplaatsNaarWGO2 — werkproces verplaatsen naar WGO2 Witgoed Omruilactie uitval BRP werkbak"
+  ],
+  "uitvalpad": "Wanneer een cliënt geen BRP-koppeling heeft (bekende functionele uitval), volgt de robot het alternatieve pad: het werkproces wordt verplaatst naar de werkbak WGO2 Witgoed Omruilactie uitval BRP en de transactie wordt als BusinessRuleException gemarkeerd.",
+  "rechten": [
+    {
+      "applicatie": "Suite",
+      "type": "Web",
+      "browser": "Edge",
+      "rechten": "Toegang en bewerkingsrechten WGO werkbak",
+      "opmerkingen": "Zaaksysteem gemeente Eindhoven; beschikbaar in alle OTAP-omgevingen"
+    }
+  ],
+  "browser_settings": "De gemeente Eindhoven gebruikt Microsoft Edge. De robot navigeert via Edge naar de Suite-omgeving. Er zijn geen speciale downloadinstellingen vereist voor dit proces. De Suite-URL is omgevingsafhankelijk en wordt beheerd via de Orchestrator-asset Suite_URL.",
+  "robotontwerp_prose": "De robot maakt gebruik van het MvR_REFramework, een state machine bestaande uit de fasen Initialization, GetTransactionData, Process en EndProcess. In de Initialization-fase worden de assets geladen en wordt Suite geopend en ingelogd. In de GetTransactionData-fase worden werkprocessen één voor één uit de Orchestrator-queue opgehaald. In de Process-fase worden de processtappen uitgevoerd per transactie-item.",
+  "dispatcher_aanwezig": "Nee",
+  "queue_naam": "SMOS_OmruilactieWitgoed",
+  "queue_retry": "Nee",
+  "max_retry": "0",
+  "retry_prose": "Dit is een queue-based robot zonder retry. Elk werkproces in fase 10 (Witgoed Omruilactie) wordt als queue-item aangeboden. Wanneer een item succesvol is verwerkt, wordt het als Successful gemarkeerd. Bij een BusinessRuleException wordt het item als Business Exception gemarkeerd. Bij een SystemException wordt het item als Application Exception gemarkeerd. QueueRetry staat uit; framework retry staat op 0.",
+  "uitval_tabel": [
+    { "type": "BusinessRuleException", "trigger": "Cliënt heeft geen BRP-koppeling; werkproces verplaatst naar WGO2 uitval BRP werkbak", "gevolg": "Queue item status = Business Exception" },
+    { "type": "SystemException",       "trigger": "Technische fout bij benaderen Suite (element niet gevonden, timeout, onverwachte toestand)", "gevolg": "Queue item status = Application Exception" }
+  ],
+  "init_prose": "Tijdens de Initialization-fase worden de configuratie-assets geladen via InitAllSettings.xaml. Vervolgens wordt Suite geopend en ingelogd via workflow 001_Suite_OpenEnInloggen.xaml, waarbij de credential via Get Credential uit de Orchestrator-kluis wordt opgehaald op basis van de asset Suite_Credential. De io_TransactionData is van het type QueueItem.",
+  "assets": [
+    { "naam": "MaxTransactions",   "type": "Text",       "omschrijving": "Must be integer, or INPUTDIALOG, or ALL (unlimited)", "waarde": "ALL" },
+    { "naam": "Folder_Temp",       "type": "Text",       "omschrijving": "Tijdelijke bestandsmap",                              "waarde": "Data\\Temp" },
+    { "naam": "Folder_Log",        "type": "Text",       "omschrijving": "Logbestandsmap",                                     "waarde": "Data\\Log" },
+    { "naam": "LogMessageAddress", "type": "Text",       "omschrijving": "A single dash will be converted to Nothing by the framework", "waarde": "-" },
+    { "naam": "Suite_Credential",  "type": "Credential", "omschrijving": "Inloggegevens voor Suite (gebruikersnaam + wachtwoord)", "waarde": "" },
+    { "naam": "Suite_URL",         "type": "Text",       "omschrijving": "URL van de Suite-omgeving (omgevingsafhankelijk)",   "waarde": "<<FILL_BEFORE_FIRST_RUN>>" }
+  ],
+  "get_transaction_prose": "Transacties worden opgehaald uit de Orchestrator-queue SMOS_OmruilactieWitgoed. Elk queue-item vertegenwoordigt één werkproces (fase 10, Witgoed Omruilactie) dat verwerkt moet worden. De queue-items worden vóór de run aangemaakt (eenmalige bulkactie). De robot haalt queue-items op via GetQueueItem totdat de queue leeg is, waarna het framework de EndProcess-fase ingaat.",
+  "proces_prose": "De procesfase start met het openen van het werkproces (002_Suite_OpenWerkproces). Vervolgens controleert de robot de BRP-koppeling (003_Suite_ControleerBRP), die een boolean bool_BRPGekoppeld teruggeeft. Indien bool_BRPGekoppeld = True, worden stap 4 (FaseerNaarFase40) en stap 5 (FaseerNaarFase90) sequentieel uitgevoerd. Indien bool_BRPGekoppeld = False, wordt stap 6 (VerplaatsNaarWGO2) uitgevoerd, waarna een BusinessRuleException wordt gegooid zodat het framework het item als Business Exception registreert. De gehele procesfase is omsloten door een TryCatch die BusinessRuleException opvangt, logt en rethrowt naar het framework.",
+  "eindproces_prose": "Na afloop van alle transacties verstuurt het framework een logmail via SendLogEmail.xaml naar de geconfigureerde ontvangers (conform PDD: Angela den Adel en Els Veraa bij functionele of technische uitval). Tijdelijke bestanden worden opgeruimd via CleanUpTempFolder.xaml. SetTransactionStatus.xaml markeert het laatste queue-item definitief. Suite wordt gesloten via CloseAllApplications.xaml.",
+  "omgeving_prose": "De robot draait binnen het ICT-landschap van Gemeente Eindhoven. Geen externe verbinding is vereist voor Suite zelf; wel is internetverbinding nodig voor UiPath Orchestrator. De Suite-URL verschilt per omgeving (Test/Productie) en dient vóór de eerste run te worden ingesteld als Orchestrator-asset Suite_URL.",
+  "omgevingen": [
+    { "omgeving": "Test",      "eigenschap": "Suite_URL",        "waarde": "<<FILL_BEFORE_FIRST_RUN>>", "opmerkingen": "Testomgeving URL invullen in Orchestrator" },
+    { "omgeving": "Productie", "eigenschap": "Suite_URL",        "waarde": "<<FILL_BEFORE_FIRST_RUN>>", "opmerkingen": "Productieomgeving URL invullen in Orchestrator" },
+    { "omgeving": "Test",      "eigenschap": "Suite_Credential", "waarde": "",                          "opmerkingen": "Testaccount instellen in Orchestrator-kluis" },
+    { "omgeving": "Productie", "eigenschap": "Suite_Credential", "waarde": "",                          "opmerkingen": "Productieaccount instellen in Orchestrator-kluis" }
+  ],
+  "processtappen": [
+    {
+      "nr": 1,
+      "sub_proces": "OpenEnInloggen",
+      "applicatie": "Suite",
+      "workflowbestand": "001_Suite_OpenEnInloggen.xaml",
+      "doel": "Suite openen via Microsoft Edge en inloggen met credentials uit de Orchestrator-kluis",
+      "navigatie": "Robot start vanuit een lege browsersessie en navigeert naar in_Config(\"Suite_URL\")",
+      "input_argumenten": "in_Config (Dictionary<String,Object>)",
+      "output_argumenten": "(geen)",
+      "handelingen": [
+        "1. Get Credential via in_Config(\"Suite_Credential\") — retourneert gebruikersnaam (String) en wachtwoord (SecureString)",
+        "2. Open Microsoft Edge en navigeer naar in_Config(\"Suite_URL\")",
+        "3. TypeInto gebruikersnaamveld met de opgehaalde gebruikersnaam (selector vereist)",
+        "4. TypeSecureText wachtwoordveld met het opgehaalde wachtwoord (selector vereist)",
+        "5. Click inlogknop (selector vereist)",
+        "6. Check App State: wacht tot de Suite-hoofdpagina / werkbak-overzicht volledig geladen is"
+      ]
+    },
+    {
+      "nr": 2,
+      "sub_proces": "OpenWerkproces",
+      "applicatie": "Suite",
+      "workflowbestand": "002_Suite_OpenWerkproces.xaml",
+      "doel": "Werkproces uit de WGO-werkbak openen op basis van het queue-item",
+      "navigatie": "Robot bevindt zich in Suite na inloggen; navigeert naar de WGO werkbak",
+      "input_argumenten": "in_Config (Dictionary<String,Object>), in_TransactionItem (QueueItem)",
+      "output_argumenten": "(geen)",
+      "handelingen": [
+        "1. Lees werkprocesnummer / referentie uit in_TransactionItem.Reference of in_TransactionItem.SpecificContent",
+        "2. Navigeer naar de WGO werkbak in Suite (selector vereist)",
+        "3. Zoek het werkproces in de lijst op basis van het werkprocesnummer",
+        "4. Click op het werkproces-item om het te openen (selector vereist)",
+        "5. Check App State: wacht tot het werkproces volledig geladen is",
+        "6. Als een geheimhoudingsmelding verschijnt: sluit de melding via Click OK (Pick Branch of Check App State, selector vereist)"
+      ]
+    },
+    {
+      "nr": 3,
+      "sub_proces": "ControleerBRP",
+      "applicatie": "Suite",
+      "workflowbestand": "003_Suite_ControleerBRP.xaml",
+      "doel": "Controleren of de cliënt een geldige BRP-koppeling heeft in het geopende werkproces",
+      "navigatie": "Robot bevindt zich in het geopende werkproces; navigeert naar tabblad Taken",
+      "input_argumenten": "in_Config (Dictionary<String,Object>), in_TransactionItem (QueueItem)",
+      "output_argumenten": "out_BRPGekoppeld (Boolean)",
+      "handelingen": [
+        "1. Navigeer naar het tabblad Taken in het geopende werkproces (selector vereist)",
+        "2. Controleer of de taak \"Cliënt koppelen aan BRP\" aanwezig is in de takenlijst (Element Exists of Check App State)",
+        "3. Als de taak NIET aanwezig is (BRP al gekoppeld): stel out_BRPGekoppeld = True",
+        "4. Als de taak WEL aanwezig is (BRP ontbreekt): stel out_BRPGekoppeld = False",
+        "5. Als er een popup verschijnt bij het navigeren: sluit de popup die hoort bij de actieve taak (Check App State + Click OK, selector vereist)"
+      ]
+    },
+    {
+      "nr": 4,
+      "sub_proces": "FaseerNaarFase40",
+      "applicatie": "Suite",
+      "workflowbestand": "004_Suite_FaseerNaarFase40.xaml",
+      "doel": "Het geopende werkproces doorfaseren van fase 10 naar fase 40",
+      "navigatie": "Robot bevindt zich in het geopende werkproces (na ControleerBRP, BRP = Ja)",
+      "input_argumenten": "in_Config (Dictionary<String,Object>), in_TransactionItem (QueueItem)",
+      "output_argumenten": "(geen)",
+      "handelingen": [
+        "1. Click op knop \"Wijzigen fase\" in het werkproces (selector vereist)",
+        "2. Check App State: wacht tot het faseringsdialoogvenster geladen is",
+        "3. Click op knop \"Opslaan en sluiten\" (selector vereist)",
+        "4. Check App State: wacht tot het werkproces opnieuw geladen is en fase 40 toont"
+      ]
+    },
+    {
+      "nr": 5,
+      "sub_proces": "FaseerNaarFase90",
+      "applicatie": "Suite",
+      "workflowbestand": "005_Suite_FaseerNaarFase90.xaml",
+      "doel": "Het werkproces doorfaseren van fase 40 naar fase 90 met afdoening \"10 Toekenning\" en automatisch beslissen aangevinkt",
+      "navigatie": "Robot bevindt zich in het werkproces in fase 40 (direct na FaseerNaarFase40)",
+      "input_argumenten": "in_Config (Dictionary<String,Object>), in_TransactionItem (QueueItem)",
+      "output_argumenten": "(geen)",
+      "handelingen": [
+        "1. Click op knop \"Wijzigen fase\" in het werkproces (selector vereist)",
+        "2. Check App State: wacht tot het faseringsdialoogvenster geladen is",
+        "3. Selecteer in het veld \"Afdoening\" de waarde \"10 Toekenning\" (SelectItem of Click, selector vereist)",
+        "4. Vink de checkbox \"Automatisch beslissen\" aan (Check activity of Click, selector vereist)",
+        "5. Click op knop \"Opslaan en sluiten\" (selector vereist)",
+        "6. Check App State: wacht tot het werkproces verplaatst is naar werkbak ABV (fase 90 bevestigd)"
+      ]
+    },
+    {
+      "nr": 6,
+      "sub_proces": "VerplaatsNaarWGO2",
+      "applicatie": "Suite",
+      "workflowbestand": "006_Suite_VerplaatsNaarWGO2.xaml",
+      "doel": "Werkproces zonder BRP-koppeling verplaatsen naar werkbak WGO2 Witgoed Omruilactie uitval BRP",
+      "navigatie": "Robot bevindt zich in het geopende werkproces (na ControleerBRP, BRP = Nee)",
+      "input_argumenten": "in_Config (Dictionary<String,Object>), in_TransactionItem (QueueItem)",
+      "output_argumenten": "(geen)",
+      "handelingen": [
+        "1. Als er een popup verschijnt bij de actieve taak: sluit de popup (Check App State + Click OK, selector vereist)",
+        "2. Klik op het veld \"Medewerker\" in het werkproces om dit te wijzigen (selector vereist)",
+        "3. Selecteer of typ de waarde \"WGO2 Witgoed Omruilactie uitval BRP\" in het medewerker-veld (SelectItem of TypeInto + Click, selector vereist)",
+        "4. Click op knop \"Opslaan en sluiten\" (selector vereist)",
+        "5. Check App State: wacht tot het werkproces opgeslagen is",
+        "6. Throw BusinessRuleException met bericht \"Cliënt heeft geen BRP-koppeling — werkproces verplaatst naar WGO2 uitval BRP werkbak.\""
+      ]
+    }
+  ]
+}

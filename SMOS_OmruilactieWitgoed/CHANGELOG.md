@@ -2,5 +2,5 @@
 
 ## [Unreleased]
 
-## [1.0.0] - YYYY-MM-DD
-- Initial scaffold
+### Added
+- Initiële scaffolding op basis van SDD v0.1 (2026-03-26)

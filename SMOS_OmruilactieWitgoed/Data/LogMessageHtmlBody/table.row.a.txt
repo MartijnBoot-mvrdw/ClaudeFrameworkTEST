@@ -1,1 +1,0 @@
-		<tr style="height: 18px;">

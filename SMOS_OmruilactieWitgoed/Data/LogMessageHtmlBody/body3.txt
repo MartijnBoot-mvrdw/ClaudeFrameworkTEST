@@ -1,1 +1,0 @@
-<p style="text-align: left;">De run is om de volgende reden beëindigd: <I>[EndTrigger]</I>.</p>

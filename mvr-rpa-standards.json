@@ -2,6 +2,22 @@
   "system_prompt_version": "1.1",
   "organisation": "MvR",
   "purpose": "Claude Code development standards for UiPath REFramework robot projects. Apply these rules whenever scaffolding, generating or reviewing UiPath project files.",
+  "toolchain": {
+    "_note": "Authoritative script paths for all code generation. Use these — do not guess or hardcode paths elsewhere.",
+    "generate_xaml":      "uipath-ai-skills/uipath-core/scripts/generate_workflow.py",
+    "scaffold_project":   "uipath-ai-skills/uipath-core/scripts/scaffold_project.py",
+    "validate_xaml":      "uipath-ai-skills/uipath-core/scripts/validate_xaml --lint",
+    "resolve_nuget":      "uipath-ai-skills/uipath-core/scripts/resolve_nuget.py",
+    "add_config_key":     "uipath-ai-skills/uipath-core/scripts/config_xlsx_manager.py add",
+    "validate_config":    "uipath-ai-skills/uipath-core/scripts/config_xlsx_manager.py validate",
+    "wire_framework":     "uipath-ai-skills/uipath-core/scripts/modify_framework.py",
+    "add_variables":      "uipath-ai-skills/uipath-core/scripts/modify_framework.py add-variables",
+    "generate_object_repo": "uipath-ai-skills/uipath-core/scripts/generate_object_repository.py",
+    "config_xlsx_script_gap": {
+      "missing_sheets": ["CreateAssets", "LogMessageHtml", "LogmailAttachment"],
+      "note": "config_xlsx_manager.py does not cover these sheets — populate manually from SDD 2.3 after the script runs."
+    }
+  },
   "framework": {
     "default": "MvR_REFramework",
     "base": "UiPath REFramework (state machine: Initialization \u2192 GetTransactionData \u2192 Process \u2192 EndProcess)",
@@ -37,7 +53,11 @@
       "Do not rename workflow files after they are in use \u2014 it causes confusion in logs.",
       "Group workflow files that belong to the same application in one subfolder under the project root.",
       "For large application sets, use subfolders within the application folder."
-    ]
+    ],
+    "ai_skills_override": {
+      "note": "uipath-ai-skills decomposition rules default to AppName_DoAction.xaml (no number prefix). MvR overrides this — always use the NNN_ prefix derived from the SDD step number.",
+      "lint_expect": "ai-skills naming lint rules may flag the NNN_ prefix as a warning. This is expected and acceptable — treat naming INFO/WARN as non-blocking for MvR projects."
+    }
   },
   "variable_naming": {
     "casing": "PascalCase",
@@ -58,7 +78,12 @@
       "String": "(no prefix)"
     },
     "boolean_convention": "Boolean names must be self-describing so True/False is unambiguous. Example: bool_InlogschermExists. Use 'Not bool_X' rather than 'bool_X = False'.",
-    "dictionary_note": "When using a Dictionary, maintain a Dictionaries.xlsx in the Documentation folder listing all keys."
+    "dictionary_note": "When using a Dictionary, maintain a Dictionaries.xlsx in the Documentation folder listing all keys.",
+    "ai_skills_override": {
+      "note": "uipath-ai-skills generators default to camelCase with full type prefixes (strName, intCount, boolSuccess). MvR overrides this — always apply the rules above instead.",
+      "mvr_variable_style": "PascalCase, max 20 chars. Only dt_ and dict_ prefixes. No str/int/bool prefix.",
+      "mvr_examples": ["TransactionNumber", "dt_Employees", "bool_IsClientBekend", "FilePath", "dict_Config"]
+    }
   },
   "argument_naming": {
     "casing": "PascalCase with direction prefix",
@@ -78,7 +103,12 @@
       "Default values may be used for testing individual workflows, but must be cleared before linking to a calling workflow.",
       "Always link arguments immediately when invoking a workflow and importing arguments.",
       "Consider using a Dictionary argument instead of many individual arguments when many values must pass between workflows (pros: fewer arguments, easier to log; cons: less explicit, harder to debug in Locals panel)."
-    ]
+    ],
+    "ai_skills_override": {
+      "note": "uipath-ai-skills generators default to in_strUserName (direction + type prefix + name). MvR overrides this — no type prefix in argument names.",
+      "mvr_argument_style": "in_/out_/io_ prefix + PascalCase name, no type prefix after direction prefix. Exception: dt_ and dict_ prefixes are retained (e.g. in_dt_Employees).",
+      "mvr_examples": ["in_Config", "out_InvoiceNumber", "io_RetryNumber", "in_dt_Employees", "out_uiSuite"]
+    }
   },
   "activity_naming": {
     "rules": [
@@ -382,6 +412,15 @@
           "General Comments"
         ]
       }
+    },
+    "script_coverage": {
+      "_note": "Indicates whether config_xlsx_manager.py (from toolchain.add_config_key) covers each sheet. Sheets marked false must be populated manually after the script runs.",
+      "Settings":          { "script": true,  "cmd": "config_xlsx_manager.py add --sheet Settings" },
+      "Constants":         { "script": true,  "cmd": "config_xlsx_manager.py add --sheet Constants" },
+      "Assets":            { "script": true,  "cmd": "config_xlsx_manager.py add --sheet Assets" },
+      "CreateAssets":      { "script": false, "manual": "Populate from SDD 2.3 — one row per asset. See config_sheets.CreateAssets rules." },
+      "LogMessageHtml":    { "script": false, "manual": "Populate from SDD 1.1 Procesnaam. See config_sheets.LogMessageHtml rules." },
+      "LogmailAttachment": { "script": false, "manual": "One row per TransactionDetails field from PDD. See config_sheets.LogmailAttachment rules." }
     }
   },
   "logging": {
@@ -737,17 +776,22 @@
     "xaml_generation": "See xaml_generation_rules section below — that is the canonical source for all XAML generation rules."
   },
   "xaml_generation_rules": {
-    "critical_rules": [
-      "NEVER reference Exception types using the x: XAML namespace prefix. Exception lives in the System namespace, not the XAML x: namespace.",
-      "NEVER generate a generic Catch(Exception) block in XAML. Unhandled exceptions bubble up naturally to the REFramework, which handles retry logic. Do not try to catch them explicitly.",
-      "In Process.xaml, only catch BusinessRuleException explicitly. All other exceptions should propagate to the Framework.",
+    "lint_enforcement": {
+      "note": "Run toolchain.validate_xaml after every generation pass. The 71 lint rules in uipath-ai-skills enforce structural and hallucination checks. MvR-specific rules below are additional overrides on top.",
+      "required_lint_pass": ["ERROR", "WARN"],
+      "acceptable_without_fix": ["INFO"],
+      "auto_fix_available": "python -m validate_xaml <project> --lint --fix  (fixes lints 53, 54, 71, 83, 87, 89, 90, 93, 99)"
+    },
+    "mvr_lint_overrides": {
+      "naming_NNN_prefix": "MvR workflow files use NNN_ prefix (e.g. 001_Suite_Login.xaml). ai-skills decomposition lint may flag this as a naming INFO warning — acceptable, non-blocking.",
+      "required_lint_pass": "ERROR and WARN must be clean before handing off to the developer."
+    },
+    "mvr_critical_rules": [
+      "In Process.xaml, only catch BusinessRuleException explicitly. All other exceptions propagate to the MvR framework automatically.",
       "BusinessRuleException is referenced as: ui:BusinessRuleException where ui is xmlns:ui=\"http://schemas.uipath.com/workflow/activities\". Never use clr-namespace:UiPath.Core;assembly=UiPath.Core \u2014 it does not resolve in current UiPath Studio versions.",
-      "When generating Try-Catch in XAML, always verify the Catch type resolves to a fully qualified .NET type via the correct namespace alias, never via x: or bare type names.",
-      "If in doubt about a type reference in XAML, omit the Catch block entirely rather than generating an invalid reference. The Framework safety net is sufficient.",
-      "Do not generate Catch blocks for System.Exception, System.ApplicationException or any generic base exception class \u2014 these cause namespace resolution errors in UiPath Studio.",
-      "Only generate Catch blocks you are certain will resolve correctly (e.g. BusinessRuleException). Leave a TODO comment for any other exception handling the developer should add in UiPath Studio."
+      "Never add a Catch for generic Exception, System.Exception or System.ApplicationException."
     ],
-    "valid_catch_example": "Catch x:TypeArguments=\"ui:BusinessRuleException\" \u2014 where ui namespace is declared as xmlns:ui=\"http://schemas.uipath.com/workflow/activities\". This is the only correct alias. NEVER use clr-namespace:UiPath.Core;assembly=UiPath.Core for BusinessRuleException \u2014 it does not resolve in current UiPath Studio versions.",
+    "valid_catch_example": "Catch x:TypeArguments=\"ui:BusinessRuleException\" \u2014 where ui namespace is declared as xmlns:ui=\"http://schemas.uipath.com/workflow/activities\". This is the only correct alias.",
     "invalid_patterns_to_avoid": [
       "Catch(Exception) with x:Exception \u2014 INVALID",
       "DelegateInArgument(Exception) with x: prefix \u2014 INVALID",
@@ -766,13 +810,7 @@
       "Derive the numbered TODO steps directly from the PDD process description \u2014 be specific about which activities, selectors and config keys are involved.",
       "The sap2010 namespace must be declared on the root Activity element: xmlns:sap2010=\"http://schemas.microsoft.com/netfx/2010/xaml/activities/presentation\"."
     ],
-    "xaml_example": {
-      "description": "Correct pattern: meaningful DisplayName on every activity, TODO instructions in the annotation",
-      "root_sequence": "<Sequence DisplayName=\"001_Suite_Login\" sap2010:Annotation.AnnotationText=\"001_Suite_Login&#xA;&#xA;Doel: Log in op Suite via Edge.&#xA;&#xA;Input:&#xA;  in_Config &#x2192; configuratiewoordenboek&#xA;&#xA;TODO - Uit te voeren in UiPath Studio:&#xA;1. Get Credential via in_Config(&quot;Suite_Credential&quot;)&#xA;2. Open Edge en navigeer naar in_Config(&quot;Suite_URL&quot;)&#xA;3. TypeInto gebruikersnaamveld (selector vereist)&#xA;4. TypeSecureText wachtwoordveld (selector vereist)&#xA;5. Click inlogknop (selector vereist)&#xA;6. Check App State: wacht tot hoofdpagina geladen is\" sap2010:WorkflowViewState.IdRef=\"Sequence_1\">",
-      "view_state_note": "ViewState dictionaries always use x:TypeArguments=\"x:String, x:Object\" — this is correct. Only InvokeWorkflowFile.Arguments uses x:TypeArguments=\"x:String, Argument\".",
-      "view_state_on_root": "<sap:WorkflowViewStateService.ViewState><scg:Dictionary x:TypeArguments=\"x:String, x:Object\"><x:Boolean x:Key=\"IsExpanded\">True</x:Boolean><x:Boolean x:Key=\"IsAnnotationDocked\">True</x:Boolean></scg:Dictionary></sap:WorkflowViewStateService.ViewState>",
-      "placeholder_activity": "<Sequence DisplayName=\"Inloggen op Suite\" sap2010:Annotation.AnnotationText=\"TODO:&#xA;1. Get Credential via in_Config(&quot;Suite_Credential&quot;)&#xA;2. Navigeer naar in_Config(&quot;Suite_URL&quot;) in Edge&#xA;3. TypeInto gebruikersnaamveld (selector vereist)&#xA;4. TypeSecureText wachtwoordveld (selector vereist)&#xA;5. Click inlogknop (selector vereist)\"><sap:WorkflowViewStateService.ViewState><scg:Dictionary x:TypeArguments=\"x:String, x:Object\"><x:Boolean x:Key=\"IsExpanded\">True</x:Boolean><x:Boolean x:Key=\"IsAnnotationDocked\">True</x:Boolean></scg:Dictionary></sap:WorkflowViewStateService.ViewState></Sequence>"
-    },
+    "annotation_mechanics_note": "The generate_workflow.py generator (toolchain.generate_xaml) handles all XAML annotation mechanics: sap2010 namespace, IsAnnotationDocked ViewState, &#xA; encoding. The rules above define WHAT goes in the annotation — the generator handles HOW.",
     "invalid_patterns": [
       "<!-- TODO: Add selector in UiPath Studio --> \u2014 INVALID: invisible in Studio designer",
       "DisplayName=\"[TODO] Voeg selector toe\" \u2014 INVALID: [TODO] prefix belongs in the annotation, not the name"

@@ -58,7 +58,14 @@
       "Bash(ls /c/Python*)",
       "Bash(powershell -command \"Get-Command python -ErrorAction SilentlyContinue | Select-Object -ExpandProperty Source\")",
       "Bash(powershell -command \"& ''C:\\\\Users\\\\MartijnBoot\\\\AppData\\\\Local\\\\Microsoft\\\\WindowsApps\\\\python3.exe'' --version\")",
-      "Bash(powershell -command \"Get-ChildItem ''C:\\\\Users\\\\MartijnBoot\\\\AppData\\\\Local\\\\Programs\\\\'' -ErrorAction SilentlyContinue | Select-Object Name\")"
+      "Bash(powershell -command \"Get-ChildItem ''C:\\\\Users\\\\MartijnBoot\\\\AppData\\\\Local\\\\Programs\\\\'' -ErrorAction SilentlyContinue | Select-Object Name\")",
+      "Bash(py -3 Scripts/generate_sdd_docx.py \"SMOS_OmruilactieWitgoed/Documentation/SDD_SMOS_OmruilactieWitgoed_data.json\" \"SMOS_OmruilactieWitgoed/Documentation/SDD_SMOS_OmruilactieWitgoed.docx\" \"Templates/MvR DW - Solution Design Document - Template.docx\")",
+      "Bash(where.exe python:*)",
+      "Bash(where.exe python3:*)",
+      "Bash(find /c/Users/MartijnBoot -name python*.exe)",
+      "Bash(\"/c/Users/MartijnBoot/.local/bin/python3.14.exe\" Scripts/generate_sdd_docx.py \"SMOS_OmruilactieWitgoed/Documentation/SDD_SMOS_OmruilactieWitgoed_data.json\" \"SMOS_OmruilactieWitgoed/Documentation/SDD_SMOS_OmruilactieWitgoed.docx\" \"Templates/MvR DW - Solution Design Document - Template.docx\")",
+      "Bash(grep -r SCAFFOLD c:UsersMartijnBootDocumentsGitHub-MvRDWClaudeFrameworkTESTClaudeFrameworkTESTMvR_REFramework --include=*.xaml -l)",
+      "Bash(python -c \"import json; json.load\\(open\\(r''c:\\\\Users\\\\MartijnBoot\\\\Documents\\\\GitHub-MvRDW\\\\ClaudeFrameworkTEST\\\\ClaudeFrameworkTEST\\\\mvr-rpa-standards.json''\\)\\); print\\(''valid''\\)\")"
     ]
   }
 }

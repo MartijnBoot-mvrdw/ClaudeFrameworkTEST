@@ -56,6 +56,80 @@ Extract the following (use `<<ONBEKEND>>` for anything not found):
 | QueueRetry required | Exception handling / retry section |
 | Test vs Prod differences | Environment section |
 
+## Step 3b — Architecture check and feasibility assessment
+
+Before generating the SDD, run these checks against the extracted PDD data. Results feed
+directly into Step 4 pre-flight and SDD Section 2.1.
+
+### Architecture check (Rule P-2)
+
+Answer these questions in order:
+
+1. **Does the PDD describe BOTH (a) reading/scraping a list of items AND (b) processing each
+   item individually with per-item status?**
+   → YES = recommend **Dispatcher + Performer** (two separate projects). Flag in pre-flight.
+   → NO = single performer or sequence (continue to Q2).
+2. **Does the process only process queue items that another system creates?**
+   → YES = performer-only.
+3. **Does the process use Config.xlsx, retry logic, and a structured init/process/end lifecycle?**
+   → YES = REFramework single-project (performer pattern, no dispatcher).
+4. **Everything else** → simple sequence.
+
+If Dispatcher+Performer is recommended, the SDD must note this in Section 2.1 and Section 2.4.
+
+### Per-step feasibility table
+
+For every `Geautomatiseerd` row in the procesflow, classify the step and flag risks:
+
+| Classification | Signs in PDD | Activity | Risk flags |
+|---|---|---|---|
+| Web UI — login | "inloggen", "authenticeren", browser app | NApplicationCard, NTypeInto, NClick | MFA/2FA? CAPTCHA? SSO redirect? |
+| Web UI — action | "klik", "open", "invul", "navigeer", browser app | NApplicationCard, NClick, NTypeInto | Dynamic selectors — inspection required |
+| Web UI — read | "lees", "extraheer", "kopieer", browser app | NGetText, NGetAttribute | Pagination? Dynamic table? |
+| SAP | "SAP", "transactiecode", "dynpro" | NSAPLogon, NSAPClickToolbarButton, NSAPReadStatusbar | SAP-specific rules S-1 through S-5 |
+| Desktop | "applicatie", "Windows programma", geen browser | NApplicationCard, NClick, NTypeInto | No Playwright — requires PowerShell inspection |
+| API / REST | "API", "REST", "webservice", "endpoint" | HttpClient (UiPath.WebAPI.Activities) | Credentials, rate limits, OAuth? |
+| Queue / Orchestrator | "queue item", "SetTransactionStatus" | GetQueueItem, SetTransactionStatus | Already addressed by REFramework |
+| Data / Excel | "Excel", "CSV", "DataTable", "rapportage" | UseExcelFile, ReadRange, WriteRange | File path in Config? |
+| Email | "e-mail", "Outlook", "verstuur bericht" | GetIMAPMailMessages, SendMail | UiPath.Mail.Activities required |
+| PDF | "PDF", "rapportage PDF" | ReadPDFText, ReadPDFWithOCR | UiPath.PDF.Activities required |
+
+**Not-automatable risks — flag these in pre-flight:**
+- CAPTCHA on login page → mark as `⚠️ CAPTCHA — handmatige ingreep vereist`
+- Hardware MFA token → mark as `⚠️ MFA — authenticatie vereist`
+- Physical actions (scan, print, physical handling) → mark as `✗ Buiten scope robotisering`
+- "Judgment calls" described as human decisions without rules → mark as `⚠️ Beslissingsregel ontbreekt in PDD`
+
+### Architecture rules pre-check (A-1, A-3, A-5)
+
+Verify these against the extracted procesflow BEFORE writing the SDD:
+
+- **A-1**: Every application has an explicit `OpenEnInloggen` step as the FIRST step for that app.
+  If any app is missing this → add the step to the procesflow, note it in pre-flight.
+- **A-3**: No handelingen step passes credentials as arguments between workflows.
+  Credentials are fetched inside the workflow that uses them via `GetRobotCredential`.
+  If PDD implies passing username/password → flag in pre-flight and correct in SDD.
+- **A-5**: No single workflow step is described in the PDD as doing too many things (e.g.,
+  "open app, login, navigate, fill form, submit, extract result" = should be split into
+  multiple stubs). Flag over-broad steps for decomposition.
+
+### NuGet package forecast
+
+Based on the automation types identified above, list the NuGet packages that will be needed.
+Include this forecast in Section 2.1 of the SDD and pass it to scaffold-robot.
+
+| Package | When needed |
+|---|---|
+| `UiPath.System.Activities` | Always |
+| `UiPath.UIAutomation.Activities` | Any Web UI, Desktop UI, or SAP step |
+| `UiPath.Excel.Activities` | Any Excel/data step |
+| `UiPath.Mail.Activities` | Any email step |
+| `UiPath.PDF.Activities` | Any PDF step |
+| `UiPath.WebAPI.Activities` | Any API/REST step |
+| `UiPath.Testing.Activities` | Standard REFramework testing |
+| `UiPath.Database.Activities` | Any database query step |
+| `UiPath.Persistence.Activities` + `UiPath.FormActivityLibrary` | Action Center form tasks |
+
 ## Step 4 — Pre-flight check (before writing the SDD)
 
 Print a summary of the extracted data:
@@ -64,11 +138,21 @@ Print a summary of the extracted data:
 - **Project folder**: check whether `<ProjectName>/` already exists at the repo root.
   - If it exists: SDD will be written to `<ProjectName>/Documentation/`.
   - If it does **not** exist: the folder and `<ProjectName>/Documentation/` will be created.
-- **Applicaties gevonden**: list
+- **Architectuur**: Dispatcher+Performer / REFramework single / Sequence — and the P-2 reasoning
+- **Applicaties gevonden**: list with automation type (Web UI / Desktop / SAP / API) per app
 - **Processtappen** (numbered, with Handmatig/Geautomatiseerd label)
+- **Feasibility tabel** — one row per Geautomatiseerd stap:
+
+  | Nr. | Stap | Type | Activiteiten | Risico |
+  |---|---|---|---|---|
+  | 1 | OpenEnInloggen (AppName) | Web UI login | NApplicationCard, NTypeInto, NClick | Controleer MFA |
+  | 2 | ... | ... | ... | ... |
+
+- **Niet-automatiseerbaar**: flag any ⚠️ or ✗ risks found in Step 3b
 - **Business rules / BRE triggers** identified
 - **Stakeholders** (fill `<<ONBEKEND>>` for any not found in the PDD)
 - **Asset lijst**: credentials + config values + URLs found
+- **Verwachte NuGet packages**: list from Step 3b forecast
 - **Ambiguïteiten / ontbrekende PDD-secties**: anything that will become `<<ONBEKEND>>`
 
 Then ask: **"Bevestig om verder te gaan, of corrigeer bovenstaande."**
@@ -151,6 +235,10 @@ Short prose on the MvR REFramework state machine, followed by a key-value table:
 Rows: Framework (`MvR_REFramework`), Dispatcher aanwezig (`Ja`/`Nee`), Queue naam,
 QueueRetry (`Ja`/`Nee`), MaxRetry (framework) (default: `0`)
 
+Also include a **NuGet packages** row listing the packages identified in Step 3b, comma-separated.
+Example: `UiPath.System.Activities, UiPath.UIAutomation.Activities, UiPath.Excel.Activities`
+This is the authoritative source for scaffold-robot's `resolve_nuget.py` call.
+
 ### 2.2 Queue en retry mechanisme
 Prose explaining retry strategy. Then a table: `Type uitval | Trigger | Gevolg`
 Must include at least one `BusinessRuleException` row and one `SystemException` row.
@@ -205,15 +293,37 @@ Key-value table: `Eigenschap | Waarde`
 #### 4.N.2 Omschrijving handelingen
 Numbered list of step-by-step actions for this process step, derived from the PDD work instructions.
 Be specific about which UI elements, fields, buttons or screens are involved.
-These become the numbered TODO steps in the UiPath Studio stub annotation.
+These become the numbered TODO steps in the UiPath Studio stub annotation AND the `handelingen`
+array in the `.spec.json` file that `/build` reads.
+
+**Annotate each step with the expected UiPath activity** using `(activity: X)` at the end of the
+line. Use the classification from Step 3b. This lets `/build` generate accurate specs without
+re-reading the PDD.
+
+| Step type | Activity annotation |
+|---|---|
+| Get credential | `(activity: GetRobotCredential)` |
+| Open browser | `(activity: NApplicationCard — OpenMode=Always)` |
+| Attach to open browser | `(activity: NApplicationCard — OpenMode=Never)` |
+| Click button/link | `(activity: NClick)` |
+| Type text | `(activity: NTypeInto)` |
+| Type password | `(activity: NTypeInto — secure)` |
+| Read text from screen | `(activity: NGetText)` |
+| Check page loaded | `(activity: NCheckAppState)` |
+| Get queue item field | `(activity: Assign — in_TransactionItem.SpecificContent("key").ToString)` |
+| Read Excel | `(activity: UseExcelFile + ReadRange)` |
+| Send email | `(activity: SendMail)` |
+| HTTP API call | `(activity: HttpClient)` |
+| Throw business exception | `(activity: Throw BusinessRuleException)` |
+| Navigate to URL | `(activity: NClick or NApplicationCard navigate)` |
 
 **For OpenEnInloggen / Inloggen steps**, always include these actions as a baseline:
-1. Get Credential via `in_Config("<AppName>_Credential")`
-2. Open [AppName] (browser: navigate to `in_Config("<AppName>_URL")` / desktop: start application)
-3. TypeInto gebruikersnaamveld (selector vereist)
-4. TypeSecureText wachtwoordveld (selector vereist)
-5. Click inlogknop (selector vereist)
-6. Check App State: wacht tot hoofdpagina geladen is
+1. Get Credential via `in_Config("<AppName>_Credential")` (activity: GetRobotCredential)
+2. Open [AppName] (browser: navigate to `in_Config("<AppName>_URL")` / desktop: start application) (activity: NApplicationCard — OpenMode=Always)
+3. TypeInto gebruikersnaamveld (selector vereist) (activity: NTypeInto)
+4. TypeSecureText wachtwoordveld (selector vereist) (activity: NTypeInto — secure)
+5. Click inlogknop (selector vereist) (activity: NClick)
+6. Check App State: wacht tot hoofdpagina geladen is (activity: NCheckAppState)
 Extend or adjust these based on what the PDD says about the login flow for that application.
 
 ## Step 5b — Write JSON data file
